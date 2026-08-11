@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Vào phòng chơi</title>
+    <style>
+        :root {
+            --bg: #0b0a1f;
+            --card: rgba(255, 255, 255, .07);
+            --line: rgba(255, 255, 255, .15);
+            --tx: #f4f2ff;
+            --dim: #a9a3d6;
+            --acc: #7c5cff;
+            --acc2: #ff5d9e;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            background: radial-gradient(90% 55% at 50% 0%, #241c56, var(--bg));
+            color: var(--tx);
+            font: 16px/1.5 system-ui, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden;
+            overscroll-behavior: none
+        }
+
+        .screen {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom))
+        }
+
+        .screen.on {
+            display: flex
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--acc), var(--acc2));
+            border: 0;
+            color: #fff;
+            font-weight: 800;
+            padding: 16px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 17px;
+            width: 100%;
+            min-height: 54px;
+            box-shadow: 0 8px 22px rgba(124, 92, 255, .35)
+        }
+
+        .btn:disabled {
+            opacity: .45;
+            box-shadow: none
+        }
+
+        .btn.ghost {
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid var(--line);
+            box-shadow: none;
+            font-weight: 600
+        }
+
+        input {
+            background: rgba(0, 0, 0, .35);
+            border: 1px solid var(--line);
+            color: var(--tx);
+            border-radius: 14px;
+            padding: 15px 16px;
+            font-size: 17px;
+            width: 100%
+        }
+
+        input::placeholder {
+            color: #7d76ab
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: var(--dim);
+            margin: 16px 0 7px
+        }
+
+        h1 {
+            margin: 0 0 4px;
+            font-size: 25px
+        }
+
+        .sub {
+            color: var(--dim);
+            font-size: 14px;
+            margin: 0
+        }
+
+        .err {
+            color: #ff9aa6;
+            font-size: 14px;
+            min-height: 20px;
+            margin: 10px 0 0
+        }
+
+        /* --- màn nhập mã --- */
+        #s1 {
+            justify-content: center;
+            text-align: center
+        }
+
+        #pinIn {
+            text-align: center;
+            font-size: 30px;
+            letter-spacing: .3em;
+            font-weight: 800;
+            padding: 18px 10px
+        }
+
+        /* --- màn chọn trang phục --- */
+        #s2 .stagepreview {
+            flex: 0 0 auto;
+            height: 34vh;
+            min-height: 190px;
+            border-radius: 20px;
+            background: radial-gradient(90% 70% at 50% 10%, #3a2f7a, #17123a);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            position: relative;
+            overflow: hidden
+        }
+
+        #s2 .stagepreview::after {
+            content: '';
+            position: absolute;
+            left: -10%;
+            right: -10%;
+            bottom: -14%;
+            height: 46%;
+            background: linear-gradient(#5a49c9, #241d5c);
+            transform: perspective(400px) rotateX(52deg)
+        }
+
+        #s2 .stagepreview svg {
+            position: relative;
+            z-index: 2;
+            height: 92%;
+            width: auto;
+            margin-bottom: 4%;
+            filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .5))
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 14px 0 10px;
+            scrollbar-width: none
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none
+        }
+
+        .tab {
+            flex: 0 0 auto;
+            background: rgba(255, 255, 255, .07);
+            border: 1px solid var(--line);
+            color: var(--dim);
+            border-radius: 999px;
+            padding: 9px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .tab.on {
+            background: linear-gradient(135deg, var(--acc), var(--acc2));
+            color: #fff;
+            border-color: transparent
+        }
+
+        .items {
+            flex: 1;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+            gap: 10px;
+            padding-bottom: 12px;
+            align-content: start
+        }
+
+        .it {
+            background: rgba(0, 0, 0, .3);
+            border: 2px solid transparent;
+            border-radius: 14px;
+            padding: 6px 4px 7px;
+            text-align: center;
+            cursor: pointer;
+            position: relative
+        }
+
+        .it svg {
+            display: block;
+            margin: 0 auto;
+            width: 100%;
+            height: auto
+        }
+
+        .it .n {
+            font-size: 10.5px;
+            color: var(--dim);
+            line-height: 1.25;
+            margin-top: 3px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap
+        }
+
+        .it.on {
+            border-color: #fff;
+            background: rgba(124, 92, 255, .28)
+        }
+
+        .it .r {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%
+        }
+
+        .bar {
+            display: flex;
+            gap: 10px;
+            padding-top: 10px
+        }
+
+        /* --- màn sân khấu --- */
+        #s3 {
+            padding: 0
+        }
+
+        #s3 .hdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: max(12px, env(safe-area-inset-top)) 14px 10px
+        }
+
+        #s3 .hdr .t {
+            font-size: 15px;
+            font-weight: 700;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap
+        }
+
+        #s3 .hdr .c {
+            font-size: 13px;
+            color: var(--dim);
+            flex: 0 0 auto
+        }
+
+        #stage {
+            flex: 1;
+            margin: 0 10px;
+            min-height: 0
+        }
+
+        .emotes {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            padding: 12px 10px max(12px, env(safe-area-inset-bottom))
+        }
+
+        .emotes button {
+            flex: 1;
+            max-width: 74px;
+            font-size: 26px;
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 9px 0;
+            cursor: pointer;
+            min-height: 52px
+        }
+
+        .emotes button:active {
+            transform: scale(.9)
+        }
+
+        .waiting {
+            text-align: center;
+            color: var(--dim);
+            font-size: 13.5px;
+            padding: 0 14px 6px
+        }
+
+        .dots::after {
+            content: '';
+            animation: d 1.4s steps(4, end) infinite
+        }
+
+        @keyframes d {
+            0% {
+                content: ''
+            }
+
+            25% {
+                content: '.'
+            }
+
+            50% {
+                content: '..'
+            }
+
+            75% {
+                content: '...'
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== 1. NHẬP MÃ ===== -->
+    <div class="screen on" id="s1">
+        <h1>🎪 Vào phòng</h1>
+        <p class="sub">Nhập mã phòng thầy cô đang chiếu trên màn hình</p>
+        <label for="pinIn">Mã phòng</label>
+        <input id="pinIn" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="off">
+        <label for="nameIn">Tên của em</label>
+        <input id="nameIn" maxlength="24" placeholder="VD: Nguyễn Văn An" autocomplete="name">
+        <p class="err" id="e1"></p>
+        <div style="margin-top:6px"><button class="btn" id="goPick">Tiếp tục →</button></div>
+    </div>
+
+    <!-- ===== 2. CHỌN TRANG PHỤC ===== -->
+    <div class="screen" id="s2">
+        <div class="stagepreview" id="prev"></div>
+        <div class="tabs" id="tabs"></div>
+        <div class="items" id="items"></div>
+        <p class="err" id="e2"></p>
+        <div class="bar">
+            <button class="btn ghost" id="rndBtn" style="flex:0 0 58px">🎲</button>
+            <button class="btn" id="joinBtn">Lên sân khấu 🎬</button>
+        </div>
+    </div>
+
+    <!-- ===== 3. SÂN KHẤU ===== -->
+    <div class="screen" id="s3">
+        <div class="hdr">
+            <span class="t" id="rTitle">Phòng chờ</span>
+            <span class="c" id="rCount">0 người</span>
+            <button class="btn ghost" id="editBtn" style="width:auto;min-height:38px;padding:8px 14px;font-size:13px">👕
+                Đổi đồ</button>
+        </div>
+        <div id="stage"></div>
+        <p class="waiting"><span id="waitMsg" class="dots">Chờ thầy cô bắt đầu</span></p>
+        <div class="emotes" id="emotes"></div>
+    </div>
+
+    <script>window.LIVE_ENDPOINT = "https://script.google.com/macros/s/AKfycbxn39tDwvyGq6rn4AXWv_1YicZYREIwNuaMD95dnZz3DkMlcr1t2CMnw_7Nl7HhaH0Raw/exec";</script>
+    <script>
+/* === avatar_library.js === */
+/* =====================================================================
+ *  KHO TRANG PHỤC NHÂN VẬT CHIBI  —  avatar_library.js
+ *  ---------------------------------------------------------------
+ *  ĐÂY LÀ FILE DUY NHẤT CẦN SỬA khi muốn thêm quần / áo / tóc / vật cầm tay.
+ *
+ *  CÁCH NHANH NHẤT — dùng trang nhập ảnh, khỏi tính toán gì:
+ *    http://localhost:3000/avatar_import.html
+ *    Thả ảnh AI vẽ vào → nó bóc nền, cắt viền, cho kéo đặt lên người,
+ *    rồi in ra sẵn dòng code để dán xuống mục ITEMS bên dưới.
+ *
+ *  THÊM TAY (nếu ảnh đã cắt sẵn nền trong suốt):
+ *    1. Bỏ file PNG vào  public/avatars/<loại>/
+ *    2. Thêm ĐÚNG MỘT DÒNG vào mảng ITEMS, ví dụ:
+ *         I('hair_09', 'Tóc đuôi gà', 'hair', 'rare', { set:'g1', place:[134,24,244,250] }),
+ *       (tên file mặc định = <id>.png  → avatars/hair/hair_09.png)
+ *
+ *  Prompt nhờ AI vẽ:  PROMPT_TAO_TRANG_PHUC.md
+ *  Xem thử cả kho:    http://localhost:3000/avatar_rig.html
+ * ===================================================================== */
+
+(function (root) {
+  'use strict';
+
+  /* ------------------------------------------------------------------
+   * 1. RIG — KHUNG XƯƠNG CHUẨN
+   *    Mọi ảnh PNG đều vẽ trên đúng khung 512x512 này. Món đồ nằm sẵn
+   *    đúng chỗ của nó trong ảnh, phần còn lại trong suốt. Nhờ vậy ghép
+   *    ảnh chỉ là xếp chồng lên nhau -> không bao giờ lệch.
+   * ------------------------------------------------------------------ */
+  const RIG = {
+    canvas: 512,
+    baseline: 470,                       // mặt sàn (gan bàn chân)
+    head: { cx: 256, cy: 170, r: 110 },  // đầu
+    face: { eyeY: 188, eyeDx: 41 },      // hai mắt ở (256±41, 188)
+    neck: { x: 236, y: 262, w: 40, h: 34 },
+    torso: { x: 191, y: 280, w: 130, h: 118 },
+    shoulder: { l: [188, 306], r: [324, 306] },
+    hand: { l: [152, 388], r: [360, 388] }, // TAY PHẢI NHÂN VẬT = bên phải màn hình
+    hip: { y: 398 },
+    foot: { l: [226, 470], r: [286, 470] }
+  };
+
+  /* ------------------------------------------------------------------
+   * 2. THỨ TỰ XẾP LỚP (số nhỏ = nằm dưới)
+   * ------------------------------------------------------------------ */
+  const LAYERS = [
+    { key: 'hairBack', z: 10 },  // phần tóc dài xoã sau lưng (tuỳ chọn)
+    { key: 'body', z: 20 },  // thân + mặt (theo tông da)
+    { key: 'pants', z: 30 },
+    { key: 'shirt', z: 40 },
+    { key: 'hair', z: 50 },
+    { key: 'hand', z: 60 }   // vật cầm tay
+  ];
+
+  /* ------------------------------------------------------------------
+   * 3. CÁC LOẠI TRANG PHỤC (hiện trên thanh chọn của học sinh)
+   * ------------------------------------------------------------------ */
+  const CATEGORIES = [
+    { key: 'body', label: 'Tông da', icon: '🧒', required: true },
+    { key: 'hair', label: 'Tóc', icon: '💇', required: false },
+    { key: 'shirt', label: 'Áo', icon: '👕', required: false },
+    { key: 'pants', label: 'Quần', icon: '👖', required: false },
+    { key: 'hand', label: 'Vật cầm tay', icon: '🗡️', required: false }
+  ];
+
+  const RARITY = {
+    common: { label: 'Thường', color: '#94a3b8' },
+    rare: { label: 'Hiếm', color: '#38bdf8' },
+    epic: { label: 'Sử thi', color: '#a855f7' },
+    legend: { label: 'Huyền thoại', color: '#f59e0b' }
+  };
+
+  /* ------------------------------------------------------------------
+   * 4. KHO ĐỒ  ←←← CHỖ DUY NHẤT CẦN SỬA ĐỂ THÊM ĐỒ MỚI
+   * ------------------------------------------------------------------
+   *  I(id, tên, loại, độ_hiếm, tuỳ_chọn)
+   *
+   *  tuỳ_chọn (bỏ trống cũng được):
+   *    { src:  'đường/dẫn/khác.png' }   ghi đè đường dẫn mặc định
+   *    { back: 'avatars/hair/x_back.png' } lớp tóc xoã sau lưng
+   *    { hue:  120 }                    xoay màu ảnh gốc (0-360) — cách
+   *                                     rẻ nhất để có 1 món nhiều màu mà
+   *                                     không phải vẽ lại
+   *    { svg:  '<g>...</g>' }           hình vẽ vector sẵn có, dùng khi
+   *                                     chưa có file PNG (đồ khởi động)
+   * ------------------------------------------------------------------ */
+
+  // ==== ĐỒ KHỞI ĐỘNG (vector dựng sẵn, chạy được ngay khi chưa có PNG) ====
+  // Khi bạn đã có PNG do Gemini vẽ, chỉ cần xoá dòng svg đi là nó tự dùng PNG.
+  const SKIN = { light: '#ffdbac', tan: '#e0ac69', deep: '#8d5524' };
+
+  function bodySvg(skin) {
+    const s = SKIN[skin], sh = shade(s, -14);
+    return `
+      <g>
+        <rect x="206" y="392" width="42" height="72" rx="20" fill="${s}"/>
+        <rect x="264" y="392" width="42" height="72" rx="20" fill="${s}"/>
+        <ellipse cx="226" cy="470" rx="30" ry="15" fill="${sh}"/>
+        <ellipse cx="286" cy="470" rx="30" ry="15" fill="${sh}"/>
+        <rect x="236" y="252" width="40" height="46" rx="14" fill="${sh}"/>
+        <rect x="191" y="280" width="130" height="122" rx="42" fill="${s}"/>
+        <path d="M188 306 Q150 344 152 388" stroke="${s}" stroke-width="34" fill="none" stroke-linecap="round"/>
+        <path d="M324 306 Q362 344 360 388" stroke="${s}" stroke-width="34" fill="none" stroke-linecap="round"/>
+        <circle cx="152" cy="392" r="25" fill="${s}"/>
+        <circle cx="360" cy="392" r="25" fill="${s}"/>
+        <circle cx="146" cy="182" r="21" fill="${sh}"/>
+        <circle cx="366" cy="182" r="21" fill="${sh}"/>
+        <circle cx="256" cy="170" r="110" fill="${s}"/>
+        <ellipse cx="215" cy="188" rx="15" ry="21" fill="#2b2338"/>
+        <ellipse cx="297" cy="188" rx="15" ry="21" fill="#2b2338"/>
+        <circle cx="220" cy="180" r="5.5" fill="#fff"/>
+        <circle cx="302" cy="180" r="5.5" fill="#fff"/>
+        <ellipse cx="188" cy="216" rx="19" ry="10" fill="#ff8fa3" opacity=".55"/>
+        <ellipse cx="324" cy="216" rx="19" ry="10" fill="#ff8fa3" opacity=".55"/>
+        <path d="M243 222 q13 14 26 0" stroke="#7a4a3a" stroke-width="6" fill="none" stroke-linecap="round"/>
+      </g>`;
+  }
+
+  function hairSvg(color, style) {
+    const c = color, d = shade(color, -18);
+    if (style === 'bob') return `<g>
+        <path d="M152 258 q-14 -96 12 -132 q92 -46 184 0 q26 36 12 132 q-16 -70 -22 -86 a84 84 0 0 0 -164 0 q-6 16 -22 86z" fill="${c}"/>
+        <path d="M150 96 q106 -74 212 0 q-58 -30 -106 -22 q-48 -8 -106 22z" fill="${d}"/>
+      </g>`;
+    if (style === 'spike') return `<g>
+        <path d="M148 172 a108 108 0 0 1 216 0 z" fill="${c}"/>
+        <path d="M150 172 l24 -60 l20 42 l26 -70 l24 56 l28 -74 l26 72 l24 -52 l22 46 l18 -36 l12 76z" fill="${c}"/>
+        <path d="M186 108 q70 -42 140 -2 q-70 -22 -140 2z" fill="${d}" opacity=".7"/>
+      </g>`;
+    if (style === 'twin') return `<g>
+        <path d="M148 172 a108 108 0 0 1 216 0 v22 h-216z" fill="${c}"/>
+        <circle cx="128" cy="212" r="40" fill="${c}"/><circle cx="384" cy="212" r="40" fill="${c}"/>
+        <circle cx="128" cy="212" r="40" fill="${d}" opacity=".35"/><circle cx="384" cy="212" r="40" fill="${d}" opacity=".35"/>
+        <rect x="150" y="164" width="30" height="26" rx="12" fill="#ff5d8f"/>
+        <rect x="332" y="164" width="30" height="26" rx="12" fill="#ff5d8f"/>
+      </g>`;
+    return `<g><path d="M148 178 a108 108 0 0 1 216 0 q-30 -34 -108 -30 q-78 -4 -108 30z" fill="${c}"/></g>`;
+  }
+
+  function shirtSvg(a, b) {
+    return `<g>
+      <rect x="183" y="272" width="146" height="126" rx="40" fill="${a}"/>
+      <path d="M188 300 Q148 342 150 390" stroke="${a}" stroke-width="40" fill="none" stroke-linecap="round"/>
+      <path d="M324 300 Q364 342 362 390" stroke="${a}" stroke-width="40" fill="none" stroke-linecap="round"/>
+      <path d="M183 330 h146 v22 h-146z" fill="${b}"/>
+      <path d="M228 272 q28 30 56 0 q-28 16 -56 0z" fill="${shade(a, -22)}"/>
+    </g>`;
+  }
+
+  function pantsSvg(c) {
+    const d = shade(c, -16);
+    return `<g>
+      <rect x="196" y="368" width="120" height="52" rx="20" fill="${c}"/>
+      <rect x="202" y="392" width="46" height="70" rx="18" fill="${c}"/>
+      <rect x="264" y="392" width="46" height="70" rx="18" fill="${c}"/>
+      <rect x="196" y="368" width="120" height="14" rx="7" fill="${d}"/>
+    </g>`;
+  }
+
+  const HAND = {
+    sword: `<g><rect x="352" y="252" width="16" height="132" rx="6" fill="#dbe4f0"/>
+      <path d="M360 240 l10 20 h-20z" fill="#f2f6fb"/>
+      <rect x="336" y="378" width="48" height="14" rx="7" fill="#8b5a2b"/>
+      <rect x="352" y="388" width="16" height="34" rx="7" fill="#5c3a1b"/></g>`,
+    book: `<g><rect x="326" y="356" width="76" height="60" rx="8" fill="#c0392b"/>
+      <rect x="334" y="364" width="60" height="44" rx="4" fill="#fdf3e3"/>
+      <rect x="362" y="364" width="4" height="44" fill="#e3d5bb"/></g>`,
+    lolly: `<g><rect x="356" y="330" width="10" height="70" rx="5" fill="#f8f4e8"/>
+      <circle cx="361" cy="312" r="34" fill="#ff6fae"/>
+      <path d="M361 312 m-34 0 a34 34 0 0 1 34 -34 a17 17 0 0 0 0 34z" fill="#fff" opacity=".7"/></g>`,
+    staff: `<g><rect x="354" y="240" width="14" height="176" rx="7" fill="#7a4a2b"/>
+      <circle cx="361" cy="232" r="30" fill="#5ee7ff" opacity=".9"/>
+      <circle cx="361" cy="232" r="30" fill="none" stroke="#c9f7ff" stroke-width="5"/></g>`,
+    balloon: `<g><path d="M361 320 q-4 30 0 62" stroke="#cbd5e1" stroke-width="4" fill="none"/>
+      <ellipse cx="361" cy="284" rx="40" ry="48" fill="#ff8a5b"/>
+      <ellipse cx="348" cy="266" rx="12" ry="16" fill="#fff" opacity=".55"/></g>`
+  };
+
+  function shade(hex, amt) {
+    const n = parseInt(hex.slice(1), 16);
+    const cl = (v) => Math.max(0, Math.min(255, v));
+    const r = cl((n >> 16) + amt * 2.2), g = cl(((n >> 8) & 255) + amt * 2.2), b = cl((n & 255) + amt * 2.2);
+    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
+
+  // ---- helper tạo item cho gọn ----
+  function I(id, name, cat, rarity, opt) {
+    const o = opt || {};
+    return {
+      id: id,
+      name: name,
+      cat: cat,
+      rarity: rarity || 'common',
+      src: o.src || ('avatars/' + cat + '/' + id + '.png'),
+      back: o.back || null,
+      hue: o.hue || 0,
+      svg: o.svg || null,
+      // BỘ (set): mỗi bộ do một người/một AI vẽ nên tỉ lệ đầu-thân khác nhau.
+      // Đội tóc bộ này lên thân bộ kia là lệch ngay, nên thanh chọn của học
+      // sinh chỉ hiện đồ CÙNG BỘ với tông da đang mặc.
+      set: o.set || 'v1',
+      // Chỗ đặt ảnh trên khung 512x512: [x, y, rộng, cao].
+      // Bỏ trống = ảnh đã vẽ sẵn đúng chỗ, phủ kín cả khung.
+      // Có giá trị = ảnh cắt sát viền, hệ thống tự đặt vào đúng vị trí này.
+      // Lấy số bằng trang avatar_import.html, khỏi phải đo tay.
+      place: o.place || null
+    };
+  }
+
+  const ITEMS = [
+    /* ---- TÔNG DA (bắt buộc chọn 1) ---- */
+    I('body_light', 'Da sáng', 'body', 'common', { svg: bodySvg('light') }),
+    I('body_tan', 'Da nâu', 'body', 'common', { svg: bodySvg('tan') }),
+    I('body_deep', 'Da ngăm', 'body', 'common', { svg: bodySvg('deep') }),
+
+    /* ---- TÓC ---- */
+    I('hair_01', 'Tóc mái ngố', 'hair', 'common', { svg: hairSvg('#3b2f2f', 'bob') }),
+    I('hair_02', 'Tóc dựng', 'hair', 'common', { svg: hairSvg('#2f3542', 'spike') }),
+    I('hair_03', 'Tóc hai búi', 'hair', 'rare', { svg: hairSvg('#ff9ff3', 'twin') }),
+    I('hair_04', 'Tóc bạch kim', 'hair', 'epic', { svg: hairSvg('#e8ecf1', 'spike') }),
+    I('hair_05', 'Tóc lửa', 'hair', 'legend', { svg: hairSvg('#ff7f50', 'spike') }),
+
+    /* ---- ÁO ---- */
+    I('shirt_01', 'Áo đồng phục', 'shirt', 'common', { svg: shirtSvg('#ffffff', '#2f6fed') }),
+    I('shirt_02', 'Áo thun xanh', 'shirt', 'common', { svg: shirtSvg('#3ec1a5', '#2a9c85') }),
+    I('shirt_03', 'Áo khoác hồng', 'shirt', 'rare', { svg: shirtSvg('#ff7eb6', '#ffd6e7') }),
+    I('shirt_04', 'Giáp tân binh', 'shirt', 'epic', { svg: shirtSvg('#8fa3bf', '#f0c419') }),
+    I('shirt_05', 'Áo choàng rồng', 'shirt', 'legend', { svg: shirtSvg('#6c3fd1', '#ffd166') }),
+
+    /* ---- QUẦN ---- */
+    I('pants_01', 'Quần short xanh', 'pants', 'common', { svg: pantsSvg('#2f6fed') }),
+    I('pants_02', 'Quần jean', 'pants', 'common', { svg: pantsSvg('#4a6fa5') }),
+    I('pants_03', 'Váy hồng', 'pants', 'rare', { svg: pantsSvg('#ff7eb6') }),
+    I('pants_04', 'Quần giáp', 'pants', 'epic', { svg: pantsSvg('#6b7a8f') }),
+
+    /* =================================================================
+     * BỘ ẢNH VẼ TAY (Gemini) — nhập bằng trang avatar_import.html
+     * Ảnh đã bóc nền, cắt sát viền; số trong `place` là chỗ đặt trên
+     * khung 512x512. Mấy món này khớp với thân `body_g1`.
+     * ================================================================= */
+    I('body_g1', 'Da nâu (vẽ tay)', 'body', 'rare', { set: 'g1', place: [128, 40, 257, 430] }),
+    I('hair_g1', 'Tóc bạc gai', 'hair', 'epic', { set: 'g1', place: [134, 24, 244, 250] }),
+    I('shirt_g1', 'Áo thuỷ thủ', 'shirt', 'rare', { set: 'g1', place: [141, 246, 230, 141] }),
+    I('pants_g1', 'Quần jean lửng', 'pants', 'rare', { set: 'g1', place: [200, 370, 112, 98] }),
+    I('hand_g1', 'Kiếm tập', 'hand', 'epic', { set: 'g1', place: [290, 210, 148, 170] }),
+
+    /* ---- VẬT CẦM TAY ---- */
+    I('hand_01', 'Kiếm gỗ', 'hand', 'common', { svg: HAND.sword }),
+    I('hand_02', 'Sách phép', 'hand', 'common', { svg: HAND.book }),
+    I('hand_03', 'Kẹo mút', 'hand', 'rare', { svg: HAND.lolly }),
+    I('hand_04', 'Gậy pha lê', 'hand', 'epic', { svg: HAND.staff }),
+    I('hand_05', 'Bóng bay', 'hand', 'rare', { svg: HAND.balloon })
+  ];
+
+  /* ------------------------------------------------------------------
+   * 5. HÀM DÙNG CHUNG
+   * ------------------------------------------------------------------ */
+  const byId = {};
+  ITEMS.forEach(function (it) { byId[it.id] = it; });
+
+  function get(id) { return byId[id] || null; }
+
+  /** Liệt kê đồ theo loại; truyền `set` để chỉ lấy đồ cùng bộ với thân đang mặc */
+  function byCat(cat, set) {
+    return ITEMS.filter(function (i) {
+      return i.cat === cat && (!set || i.set === set);
+    });
+  }
+
+  /** Bộ nào đang mặc, suy từ tông da */
+  function setOf(outfit) {
+    const b = get(outfit && typeof outfit === 'object' ? outfit.body : outfit);
+    return b ? b.set : 'v1';
+  }
+
+  /** Danh sách các bộ đang có, kèm số món */
+  function sets() {
+    const m = {};
+    ITEMS.forEach(function (i) { m[i.set] = (m[i.set] || 0) + 1; });
+    return Object.keys(m).map(function (k) { return { set: k, count: m[k] }; });
+  }
+
+  /** Bỏ những món lạc bộ ra khỏi bộ đồ (vd đổi tông da sang bộ khác) */
+  function fixSet(outfit) {
+    const s = setOf(outfit);
+    const o = { body: outfit.body };
+    CATEGORIES.forEach(function (c) {
+      if (c.key === 'body') return;
+      const it = get(outfit[c.key]);
+      o[c.key] = it && it.set === s ? it.id : null;
+    });
+    return o;
+  }
+
+  /** Bộ đồ mặc định khi mới vào */
+  function defaultOutfit() {
+    const b = byCat('body')[0];
+    const s = b ? b.set : 'v1';
+    const first = function (c) { const l = byCat(c, s); return l.length ? l[0].id : null; };
+    return { body: b ? b.id : null, hair: first('hair'), shirt: first('shirt'), pants: first('pants'), hand: null };
+  }
+
+  /** Bộ đồ ngẫu nhiên (nút "Ngẫu nhiên") — luôn cùng một bộ cho khỏi lệch */
+  function randomOutfit(set) {
+    const bodies = byCat('body', set);
+    const body = bodies[Math.floor(Math.random() * bodies.length)];
+    const s = body ? body.set : 'v1';
+    const pick = function (c) {
+      const l = byCat(c, s);
+      return l.length ? l[Math.floor(Math.random() * l.length)].id : null;
+    };
+    return { body: body ? body.id : null, hair: pick('hair'), shirt: pick('shirt'), pants: pick('pants'), hand: pick('hand') };
+  }
+
+  /** Gọn hoá bộ đồ thành chuỗi ngắn để gửi qua mạng: "body_light|hair_01|..." */
+  function pack(outfit) {
+    return CATEGORIES.map(function (c) { return outfit && outfit[c.key] ? outfit[c.key] : ''; }).join('|');
+  }
+  function unpack(str) {
+    const p = String(str || '').split('|'), o = {};
+    CATEGORIES.forEach(function (c, i) { o[c.key] = p[i] || null; });
+    if (!o.body) o.body = 'body_light';
+    return o;
+  }
+
+  /**
+   * Dựng nhân vật thành một chuỗi SVG hoàn chỉnh.
+   * Ảnh PNG (nếu có) được nhúng bằng <image>, đồ vector dùng thẳng.
+   * @param {object} outfit  { body, hair, shirt, pants, hand }
+   * @param {object} opt     { size, basePath }
+   */
+  function renderSVG(outfit, opt) {
+    opt = opt || {};
+    const size = opt.size || 180;
+    const base = opt.basePath || '';
+    const o = outfit || defaultOutfit();
+    const parts = [];
+
+    LAYERS.slice().sort(function (a, b) { return a.z - b.z; }).forEach(function (layer) {
+      let item = null, useBack = false;
+      if (layer.key === 'hairBack') { item = get(o.hair); useBack = true; }
+      else { item = get(o[layer.key]); }
+      if (!item) return;
+      if (useBack && !item.back) return;
+
+      const filter = item.hue ? ' style="filter:hue-rotate(' + item.hue + 'deg)"' : '';
+      const p = item.place;
+      const geo = p
+        ? ' x="' + p[0] + '" y="' + p[1] + '" width="' + p[2] + '" height="' + p[3] + '" preserveAspectRatio="none"'
+        : ' x="0" y="0" width="512" height="512"';
+      if (useBack) {
+        parts.push('<image href="' + base + item.back + '"' + geo + filter + '/>');
+      } else if (item.svg) {
+        parts.push(item.hue ? '<g style="filter:hue-rotate(' + item.hue + 'deg)">' + item.svg + '</g>' : item.svg);
+      } else {
+        parts.push('<image href="' + base + item.src + '"' + geo + filter + '/>');
+      }
+    });
+
+    return '<svg class="chibi" viewBox="0 0 512 512" width="' + size + '" height="' + size +
+      '" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision">' + parts.join('') + '</svg>';
+  }
+
+  const API = {
+    RIG: RIG, LAYERS: LAYERS, CATEGORIES: CATEGORIES, RARITY: RARITY, ITEMS: ITEMS,
+    get: get, byCat: byCat, defaultOutfit: defaultOutfit, randomOutfit: randomOutfit,
+    setOf: setOf, sets: sets, fixSet: fixSet,
+    pack: pack, unpack: unpack, renderSVG: renderSVG
+  };
+
+  root.AVATAR_LIBRARY = API;
+  if (typeof module !== 'undefined' && module.exports) module.exports = API;
+
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+    <script>
+/* === live_stage.js === */
+/* =====================================================================
+ *  LIVE STAGE — sàn sân khấu 2.5D cho phòng chờ
+ *  ---------------------------------------------------------------
+ *    const stage = LiveStage.mount(document.getElementById('stage'));
+ *    stage.sync(players);   // [{ id, name, outfit, emote }]
+ *
+ *  · Người mới rơi từ trên xuống + tung khói bụi
+ *  · Người rời phòng biến mất kèm hiệu ứng poof
+ *  · Đứng thành nhiều hàng, hàng sau nhỏ hơn và lùi lên trên (phối cảnh)
+ *  · Mỗi nhân vật nhấp nhô lệch nhịp nhau cho sàn trông "sống"
+ * ===================================================================== */
+
+(function (root) {
+  'use strict';
+
+  const CSS = `
+.ls-stage{position:relative;overflow:hidden;border-radius:20px;
+  background:radial-gradient(120% 80% at 50% 0%,#3a2f7a 0%,#221c4d 45%,#120f2c 100%);
+  --unit:400px}
+.ls-stage .ls-beam{position:absolute;inset:0;pointer-events:none;
+  background:
+   conic-gradient(from 200deg at 22% -12%, transparent 0 8deg, rgba(255,255,255,.10) 8deg 16deg, transparent 16deg 360deg),
+   conic-gradient(from 140deg at 78% -12%, transparent 0 8deg, rgba(255,210,120,.10) 8deg 16deg, transparent 16deg 360deg);
+  mix-blend-mode:screen;animation:lsBeam 7s ease-in-out infinite alternate}
+@keyframes lsBeam{from{opacity:.55;transform:translateX(-1.5%)}to{opacity:1;transform:translateX(1.5%)}}
+.ls-stage .ls-floor{position:absolute;left:-6%;right:-6%;bottom:0;height:62%;
+  background:linear-gradient(#4c3fa8 0%,#2a2264 55%,#171238 100%);
+  transform:perspective(520px) rotateX(46deg);transform-origin:bottom center;
+  box-shadow:0 -22px 60px rgba(124,92,255,.45)}
+.ls-stage .ls-floor::after{content:'';position:absolute;inset:0;opacity:.28;
+  background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);
+  background-size:9% 12%}
+.ls-stage .ls-glow{position:absolute;left:0;right:0;bottom:26%;height:2px;
+  background:linear-gradient(90deg,transparent,#8b7cff,#ff7ec8,#8b7cff,transparent);
+  filter:blur(2px);opacity:.9}
+.ls-stage .ls-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:#b9b2e8;font-size:clamp(14px,2.2vw,20px);text-align:center;padding:0 12%;line-height:1.6}
+
+.ls-p{position:absolute;bottom:0;left:50%;width:60px;
+  transform:translateX(-50%);transition:left .55s cubic-bezier(.22,1.2,.36,1),bottom .55s cubic-bezier(.22,1.2,.36,1),width .4s ease;
+  will-change:left,bottom}
+.ls-p .ls-body{animation:lsIdle 2.6s ease-in-out infinite;transform-origin:50% 100%}
+.ls-p svg{display:block;width:100%;height:auto;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}
+@keyframes lsIdle{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-6%) scaleY(1.02)}}
+.ls-p.ls-new .ls-body{animation:lsDrop .72s cubic-bezier(.3,1.5,.5,1) 1,lsIdle 2.6s ease-in-out .72s infinite}
+@keyframes lsDrop{0%{transform:translateY(-260%) scale(.85);opacity:0}
+  55%{transform:translateY(0) scale(1);opacity:1}
+  70%{transform:translateY(0) scaleY(.78) scaleX(1.14)}
+  85%{transform:translateY(-8%) scaleY(1.06) scaleX(.96)}
+  100%{transform:translateY(0) scale(1)}}
+.ls-p.ls-out{animation:lsPoof .4s ease-in forwards}
+@keyframes lsPoof{to{transform:translateX(-50%) scale(.2) rotate(18deg);opacity:0}}
+
+.ls-p .ls-dust{position:absolute;left:50%;bottom:-6%;width:150%;height:36%;transform:translateX(-50%);
+  pointer-events:none}
+.ls-p .ls-dust i{position:absolute;bottom:0;width:26%;height:60%;border-radius:50%;
+  background:rgba(255,255,255,.55);opacity:0}
+.ls-p.ls-new .ls-dust i{animation:lsDust .6s ease-out .5s forwards}
+.ls-p .ls-dust i:nth-child(1){left:4%}
+.ls-p .ls-dust i:nth-child(2){left:36%;animation-delay:.55s!important}
+.ls-p .ls-dust i:nth-child(3){left:68%;animation-delay:.6s!important}
+@keyframes lsDust{0%{opacity:.85;transform:scale(.3)}100%{opacity:0;transform:scale(1.5) translateY(-30%)}}
+
+.ls-p .ls-tag{position:absolute;left:50%;top:9%;transform:translate(-50%,-100%);
+  background:rgba(12,10,32,.82);border:1px solid rgba(255,255,255,.22);color:#fff;
+  padding:.16em .6em;border-radius:999px;white-space:nowrap;
+  font-weight:700;letter-spacing:.01em;line-height:1.35;
+  max-width:125%;overflow:hidden;text-overflow:ellipsis;backdrop-filter:blur(3px)}
+.ls-p.ls-me .ls-tag{background:linear-gradient(90deg,#7c5cff,#ff5d9e);border-color:#fff}
+.ls-p.ls-me::after{content:'';position:absolute;left:50%;bottom:-4%;width:70%;height:14%;
+  transform:translateX(-50%);border-radius:50%;background:radial-gradient(#ffd76a,transparent 70%);opacity:.8}
+
+.ls-p .ls-emote{position:absolute;left:50%;top:-12%;transform:translate(-50%,-100%) scale(0);
+  font-size:1.6em;animation:lsEmote 1.8s ease-out forwards}
+@keyframes lsEmote{0%{transform:translate(-50%,-60%) scale(0)}
+  20%{transform:translate(-50%,-100%) scale(1.25)}
+  35%{transform:translate(-50%,-100%) scale(1)}
+  80%{opacity:1}100%{transform:translate(-50%,-190%) scale(1);opacity:0}}
+`;
+
+  let cssDone = false;
+  function injectCSS() {
+    if (cssDone) return; cssDone = true;
+    const s = document.createElement('style'); s.textContent = CSS; document.head.appendChild(s);
+  }
+
+  function hash(str) {
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return (h >>> 0) / 4294967295;
+  }
+
+  /**
+   * Hàng 0 ở gần khán giả nhất (to nhất). Đầy hàng thì lùi ra hàng sau.
+   * Số người mỗi hàng co theo bề ngang: màn chiếu xếp 6, điện thoại chỉ 3
+   * — nếu không nhân vật trên điện thoại bé như con kiến.
+   */
+  function rowBase(W) { return Math.max(3, Math.min(8, Math.round(W / 180))); }
+  function capacityOf(row, W) { return rowBase(W) + row * 2; }
+
+  function slotOf(index, W) {
+    let r = 0, k = index;
+    while (k >= capacityOf(r, W)) { k -= capacityOf(r, W); r++; }
+    return { row: r, col: k };
+  }
+
+  /**
+   * Tính chỗ đứng theo PIXEL. Cỡ nhân vật bị chặn bởi cả bề ngang sân khấu
+   * (chia đều cho số người mỗi hàng) lẫn chiều cao — thiếu vế nào cũng thành
+   * chen chúc hoặc bé tí.
+   */
+  function layoutOf(index, total, W, H) {
+    const s = slotOf(index, W), cap = capacityOf(s.row, W);
+    let before = 0;
+    for (let r = 0; r < s.row; r++) before += capacityOf(r, W);
+    const inRow = Math.max(1, Math.min(cap, total - before));
+
+    // Chặn dưới 48px: cửa sổ bị kéo thấp thì thà tràn còn hơn thu bé như hạt gạo
+    const base = Math.max(48, Math.min(H * 0.40, (W * 0.94 / capacityOf(0, W))));
+    const scale = Math.max(.46, 1 - s.row * 0.14);
+    const size = base * scale;
+    const gap = (W * 0.94 / cap);
+    const left = W / 2 + (s.col - (inRow - 1) / 2) * Math.min(gap, size * 1.02);
+    const bottom = H * 0.06 + s.row * (base * 0.75);
+
+    return { left: left, bottom: bottom, size: size, z: 200 - s.row * 10 };
+  }
+
+  function mount(el, opt) {
+    injectCSS();
+    opt = opt || {};
+    const L = root.AVATAR_LIBRARY;
+    el.classList.add('ls-stage');
+    el.innerHTML = '<div class="ls-floor"></div><div class="ls-glow"></div><div class="ls-beam"></div>' +
+      '<div class="ls-empty">' + (opt.emptyText || 'Sân khấu đang trống — chờ người chơi vào…') + '</div>';
+    const emptyEl = el.querySelector('.ls-empty');
+
+    const nodes = new Map();   // id -> element
+    let lastList = [];
+
+    // Đổi cỡ cửa sổ / xoay ngang điện thoại -> xếp lại chỗ đứng
+    let relayout = null;
+    function onResize() {
+      clearTimeout(relayout);
+      relayout = setTimeout(function () { sync(lastList); }, 80);
+    }
+    if (root.ResizeObserver) new ResizeObserver(onResize).observe(el);
+    else root.addEventListener('resize', onResize);
+
+    function makeNode(p) {
+      const d = document.createElement('div');
+      d.className = 'ls-p ls-new' + (opt.meId && p.id === opt.meId ? ' ls-me' : '');
+      d.innerHTML = '<div class="ls-dust"><i></i><i></i><i></i></div>' +
+        '<div class="ls-tag"></div><div class="ls-body"></div>';
+      d.querySelector('.ls-body').style.animationDelay = (-hash(p.id) * 2.6).toFixed(2) + 's';
+      el.appendChild(d);
+      setTimeout(function () { d.classList.remove('ls-new'); }, 1400);
+      return d;
+    }
+
+    function paint(node, p) {
+      const tag = node.querySelector('.ls-tag');
+      if (tag.textContent !== p.name) tag.textContent = p.name;
+      const key = L.pack(p.outfit && typeof p.outfit === 'object' ? p.outfit : L.unpack(p.outfit));
+      if (node.dataset.outfit !== key) {
+        node.dataset.outfit = key;
+        node.querySelector('.ls-body').innerHTML =
+          L.renderSVG(typeof p.outfit === 'string' ? L.unpack(p.outfit) : p.outfit, { size: 512 });
+      }
+      if (p.emote && node.dataset.emote !== String(p.emote.t)) {
+        node.dataset.emote = String(p.emote.t);
+        const e = document.createElement('div');
+        e.className = 'ls-emote'; e.textContent = p.emote.e;
+        node.appendChild(e);
+        setTimeout(function () { e.remove(); }, 1900);
+      }
+    }
+
+    function sync(list) {
+      list = list || [];
+      lastList = list;
+      emptyEl.style.display = list.length ? 'none' : 'flex';
+
+      const W = el.clientWidth || 800, H = el.clientHeight || 400;
+      const seen = new Set();
+      list.forEach(function (p, i) {
+        seen.add(p.id);
+        let node = nodes.get(p.id);
+        if (!node) { node = makeNode(p); nodes.set(p.id, node); }
+        paint(node, p);
+        const g = layoutOf(i, list.length, W, H);
+        const jitter = (hash(p.id + 'x') - .5) * g.size * 0.10;
+        node.style.left = Math.round(g.left + jitter) + 'px';
+        node.style.bottom = Math.round(g.bottom) + 'px';
+        node.style.width = Math.round(g.size) + 'px';
+        node.style.zIndex = g.z + (p.id === opt.meId ? 500 : 0);
+        node.querySelector('.ls-tag').style.fontSize =
+          Math.max(9, Math.min(17, g.size * 0.115)).toFixed(1) + 'px';
+      });
+
+      nodes.forEach(function (node, id) {
+        if (seen.has(id)) return;
+        node.classList.add('ls-out');
+        nodes.delete(id);
+        setTimeout(function () { node.remove(); }, 450);
+      });
+    }
+
+    return {
+      el: el,
+      sync: sync,
+      count: function () { return lastList.length; },
+      setMe: function (id) { opt.meId = id; sync(lastList); }
+    };
+  }
+
+  root.LiveStage = { mount: mount, layoutOf: layoutOf };
+
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+    <script>
+/* === live_net.js === */
+/* =====================================================================
+ *  LIVE NET — lớp kết nối phòng chơi trực tiếp
+ *  ---------------------------------------------------------------
+ *  Cùng một bộ hàm chạy được ở 2 nơi:
+ *    · Chạy thử ở máy:  POST tới  http://localhost:3000/live   (server.js)
+ *    · Bản thật:        POST tới  Google Apps Script /exec     (template.js)
+ *
+ *  Trang nào muốn dùng bản thật thì đặt trước khi nạp file này:
+ *      <script>window.LIVE_ENDPOINT = 'https://script.google.com/.../exec';<\/script>
+ * ===================================================================== */
+
+(function (root) {
+  'use strict';
+
+  // Thứ tự ưu tiên: biến gắn sẵn trong trang > tham số ?api=... trên URL > máy này
+  let ep = root.LIVE_ENDPOINT;
+  if (!ep && typeof location !== 'undefined') {
+    try { ep = new URLSearchParams(location.search).get('api') || ''; } catch (e) { }
+  }
+  const ENDPOINT = ep || '/live';
+  const IS_GAS = /script\.google\.com/.test(ENDPOINT);
+
+  function call(action, payload) {
+    const body = JSON.stringify(Object.assign({ action: action }, payload || {}));
+    return fetch(ENDPOINT, {
+      method: 'POST',
+      mode: 'cors',
+      redirect: 'follow',
+      // text/plain để không sinh preflight OPTIONS — Apps Script không trả lời OPTIONS
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: body
+    }).then(function (r) {
+      if (!r.ok) throw new Error('Lỗi mạng ' + r.status);
+      return r.json();
+    }).then(function (d) {
+      if (d && d.error) throw new Error(d.error);
+      return d;
+    });
+  }
+
+  /** Vòng lặp hỏi trạng thái phòng. Tự giãn nhịp khi tab bị ẩn hoặc mạng lỗi. */
+  function Poller(pin, onState, opt) {
+    opt = opt || {};
+    // Apps Script tính hạn mức theo TỔNG THỜI GIAN CHẠY (tài khoản Gmail thường
+    // chỉ 90 phút/ngày), chứ không theo số lượt gọi. Nên:
+    //   · phòng đang có người vào ra  -> hỏi dày, cho kịp không khí
+    //   · phòng đứng yên              -> giãn dần ra tới `slow`, đỡ tốn quota
+    // Đo thật: bỏ phần giãn nhịp này thì một buổi 40 em ăn gần 20 phút quota.
+    const fast = opt.interval || (IS_GAS ? 3000 : 800);
+    const slow = opt.maxInterval || (IS_GAS ? fast * 4 : fast * 3);
+    let rev = -1, timer = null, stopped = false, fails = 0, idle = 0;
+
+    function tick() {
+      if (stopped) return;
+      call('liveState', { pin: pin, rev: rev, playerId: opt.playerId || '' })
+        .then(function (d) {
+          fails = 0;
+          if (d && d.changed === false) {
+            idle++;                       // không có gì mới -> thở chậm lại
+          } else if (d) {
+            idle = 0; rev = d.rev; onState(d);
+          }
+          const wait = Math.min(slow, Math.round(fast * (1 + idle * 0.6)));
+          schedule(document.hidden ? wait * 3 : wait);
+        })
+        .catch(function (e) {
+          fails++;
+          if (opt.onError) opt.onError(e, fails);
+          schedule(Math.min(fast * Math.pow(1.8, fails), 15000));
+        });
+    }
+    function schedule(ms) { clearTimeout(timer); timer = setTimeout(tick, ms); }
+
+    return {
+      start: function () { stopped = false; tick(); return this; },
+      stop: function () { stopped = true; clearTimeout(timer); },
+      refreshNow: function () { rev = -1; idle = 0; schedule(0); }
+    };
+  }
+
+  root.LiveNet = {
+    endpoint: ENDPOINT,
+    isGAS: IS_GAS,
+    call: call,
+    Poller: Poller,
+
+    createRoom: function (title, quizId) { return call('liveCreate', { title: title, quizId: quizId || '' }); },
+    join: function (pin, name, outfit) { return call('liveJoin', { pin: pin, name: name, outfit: outfit }); },
+    update: function (pin, playerId, outfit, name) { return call('liveUpdate', { pin: pin, playerId: playerId, outfit: outfit, name: name }); },
+    leave: function (pin, playerId) { return call('liveLeave', { pin: pin, playerId: playerId }); },
+    hostCmd: function (pin, token, cmd, arg) { return call('liveHost', { pin: pin, hostToken: token, cmd: cmd, arg: arg || '' }); },
+    emote: function (pin, playerId, emote) { return call('liveEmote', { pin: pin, playerId: playerId, emote: emote }); }
+  };
+
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+    <script>
+        const $ = id => document.getElementById(id);
+        const L = window.AVATAR_LIBRARY;
+        const SAVE = 'liveMe';
+
+        let outfit = L.defaultOutfit(), cat = 'body';
+        let PIN = '', NAME = '', MYID = null, poller = null, stage = null, joined = false;
+
+        /* nhớ lại lần trước */
+        try {
+            const s = JSON.parse(localStorage.getItem(SAVE) || '{}');
+            if (s.name) $('nameIn').value = s.name;
+            if (s.outfit) outfit = L.fixSet(Object.assign(L.defaultOutfit(), L.unpack(s.outfit)));
+        } catch (e) { }
+        const qp = new URLSearchParams(location.search);
+        if (qp.get('pin')) $('pinIn').value = qp.get('pin').replace(/\D/g, '').slice(0, 6);
+
+        function show(n) { ['s1', 's2', 's3'].forEach(id => $(id).classList.toggle('on', id === n)); }
+
+        /* ---------- 1. nhập mã ---------- */
+        $('pinIn').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 6); });
+        $('goPick').onclick = function () {
+            PIN = $('pinIn').value.trim();
+            NAME = $('nameIn').value.trim().replace(/\s+/g, ' ');
+            if (PIN.length !== 6) return $('e1').textContent = 'Mã phòng gồm 6 chữ số.';
+            if (NAME.length < 2) return $('e1').textContent = 'Em nhập tên đầy đủ giúp thầy cô nhé.';
+            $('e1').textContent = '';
+            buildPicker(); show('s2');
+        };
+
+        /* ---------- 2. chọn trang phục ---------- */
+        function drawPreview() { $('prev').innerHTML = L.renderSVG(outfit, { size: 512 }); }
+
+        function buildTabs() {
+            $('tabs').innerHTML = L.CATEGORIES.map(c =>
+                '<div class="tab' + (c.key === cat ? ' on' : '') + '" data-c="' + c.key + '">' + c.icon + ' ' + c.label + '</div>').join('');
+            $('tabs').querySelectorAll('.tab').forEach(t => t.onclick = () => { cat = t.dataset.c; buildTabs(); buildItems(); });
+        }
+
+        function buildItems() {
+            const c = L.CATEGORIES.find(x => x.key === cat);
+            // Tông da quyết định "bộ"; các loại khác chỉ hiện đồ cùng bộ,
+            // vì đồ khác bộ vẽ theo tỉ lệ đầu-thân khác nên đội vào là lệch.
+            const list = cat === 'body' ? L.byCat(cat) : L.byCat(cat, L.setOf(outfit));
+            let html = '';
+            if (!c.required) {
+                html += '<div class="it' + (!outfit[cat] ? ' on' : '') + '" data-id=""><div style="height:56px;display:flex;align-items:center;justify-content:center;font-size:24px;opacity:.5">🚫</div><div class="n">Không dùng</div></div>';
+            }
+            html += list.map(function (i) {
+                const o = { body: outfit.body || 'body_light' }; o[i.cat] = i.id;
+                const r = L.RARITY[i.rarity] || L.RARITY.common;
+                return '<div class="it' + (outfit[cat] === i.id ? ' on' : '') + '" data-id="' + i.id + '">' +
+                    '<span class="r" style="background:' + r.color + '"></span>' +
+                    L.renderSVG(o, { size: 76 }) + '<div class="n">' + i.name + '</div></div>';
+            }).join('');
+            $('items').innerHTML = html;
+            $('items').querySelectorAll('.it').forEach(function (el) {
+                el.onclick = function () {
+                    outfit[cat] = el.dataset.id || null;
+                    if (cat === 'body') outfit = L.fixSet(outfit);   // đổi bộ -> bỏ đồ lạc bộ
+                    buildItems(); drawPreview(); pushOutfit();
+                };
+            });
+        }
+
+        function buildPicker() { buildTabs(); buildItems(); drawPreview(); }
+
+        $('rndBtn').onclick = function () { outfit = L.randomOutfit(); buildItems(); drawPreview(); pushOutfit(); };
+
+        let pushTimer = null;
+        function pushOutfit() {
+            if (!joined) return;
+            clearTimeout(pushTimer);
+            pushTimer = setTimeout(function () {
+                LiveNet.update(PIN, MYID, L.pack(outfit)).catch(function () { });
+            }, 400);
+        }
+
+        function remember() {
+            try { localStorage.setItem(SAVE, JSON.stringify({ name: NAME, outfit: L.pack(outfit) })); } catch (e) { }
+        }
+
+        /* ---------- vào phòng ---------- */
+        $('joinBtn').onclick = function () {
+            const b = this; b.disabled = true; b.textContent = 'Đang vào…'; $('e2').textContent = '';
+            if (joined) {                       // quay lại từ nút "Đổi đồ"
+                LiveNet.update(PIN, MYID, L.pack(outfit), NAME).catch(function () { });
+                remember(); b.disabled = false; b.textContent = 'Lên sân khấu 🎬'; show('s3');
+                if (poller) poller.refreshNow();
+                return;
+            }
+            LiveNet.join(PIN, NAME, L.pack(outfit))
+                .then(function (d) {
+                    MYID = d.playerId; joined = true; remember();
+                    $('rTitle').textContent = d.title || 'Phòng chờ';
+                    b.disabled = false; b.textContent = 'Lên sân khấu 🎬';
+                    startStage();
+                })
+                .catch(function (e) {
+                    $('e2').textContent = e.message || 'Không vào được phòng.';
+                    b.disabled = false; b.textContent = 'Lên sân khấu 🎬';
+                });
+        };
+
+        /* ---------- 3. sân khấu ---------- */
+        function startStage() {
+            show('s3');
+            stage = LiveStage.mount($('stage'), { meId: MYID, emptyText: 'Đang lên sân khấu…' });
+            $('emotes').innerHTML = ['👍', '😂', '🔥', '❤️', '😮'].map(e =>
+                '<button data-e="' + e + '">' + e + '</button>').join('');
+            let lastEmote = 0;
+            $('emotes').querySelectorAll('button').forEach(b => b.onclick = function () {
+                if (navigator.vibrate) navigator.vibrate(15);
+                if (Date.now() - lastEmote < 1500) return;   // chặn spam, đỡ tốn hạn mức
+                lastEmote = Date.now();
+                LiveNet.emote(PIN, MYID, b.dataset.e).catch(function () { });
+            });
+
+            poller = LiveNet.Poller(PIN, function (d) {
+                const players = d.players || [];
+                stage.sync(players);
+                $('rCount').textContent = players.length + ' người';
+                if (d.title) $('rTitle').textContent = d.title;
+                if (!players.some(p => p.id === MYID)) {
+                    $('waitMsg').className = ''; $('waitMsg').textContent = '⚠️ Em đã bị mời ra khỏi phòng.';
+                } else if (d.status === 'playing') {
+                    $('waitMsg').className = ''; $('waitMsg').textContent = '🎬 Bài làm sắp bắt đầu!';
+                }
+            }, {
+                // Màn hình lớp mới là cái cả lớp nhìn, nên để nó hỏi dày.
+                // Điện thoại từng em hỏi thưa hơn, và giãn tới 20s khi phòng
+                // đứng yên — đo thật cho thấy đây là chỗ ngốn quota nhiều nhất.
+                interval: LiveNet.isGAS ? 4000 : 900,
+                maxInterval: LiveNet.isGAS ? 20000 : 3000,
+                playerId: MYID,
+                onError: function (e, n) { if (n > 2) { $('waitMsg').className = ''; $('waitMsg').textContent = '📶 Mạng chập chờn, đang thử lại…'; } }
+            }).start();
+        }
+
+        $('editBtn').onclick = function () { buildPicker(); show('s2'); };
+
+        window.addEventListener('beforeunload', function () {
+            if (poller) poller.stop();
+            if (joined && navigator.sendBeacon) {
+                try { navigator.sendBeacon(LiveNet.endpoint, new Blob([JSON.stringify({ action: 'liveLeave', pin: PIN, playerId: MYID })], { type: 'text/plain' })); } catch (e) { }
+            }
+        });
+    </script>
+</body>
+
+</html>
