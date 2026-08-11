@@ -241,6 +241,43 @@
             border-radius: 50%
         }
 
+        /* Món thuộc bộ khác: vẫn thấy được, bấm vào thì tự đổi bộ */
+        .it.alt {
+            opacity: .58;
+            border-style: dashed;
+            border-color: rgba(255, 255, 255, .22)
+        }
+
+        .it.alt .sw {
+            color: #ffc27a;
+            font-size: 9.5px
+        }
+
+        #toast {
+            position: fixed;
+            left: 50%;
+            bottom: 96px;
+            transform: translate(-50%, 14px);
+            background: rgba(12, 10, 32, .95);
+            border: 1px solid var(--line);
+            color: #fff;
+            padding: 11px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            max-width: 88vw;
+            text-align: center;
+            line-height: 1.45;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .22s, transform .22s;
+            z-index: 99
+        }
+
+        #toast.on {
+            opacity: 1;
+            transform: translate(-50%, 0)
+        }
+
         .bar {
             display: flex;
             gap: 10px;
@@ -441,6 +478,13 @@
     { key: 'pants', label: 'Quần', icon: '👖', required: false },
     { key: 'hand', label: 'Vật cầm tay', icon: '🗡️', required: false }
   ];
+
+  /* Tên dễ đọc của từng bộ — hiện lên cho học sinh biết mình đang mặc bộ nào.
+     Thêm bộ mới thì thêm một dòng ở đây, thiếu cũng không sao (tự lấy mã bộ). */
+  const SET_NAMES = {
+    v1: 'Bộ dựng sẵn',
+    g1: 'Bộ vẽ tay'
+  };
 
   const RARITY = {
     common: { label: 'Thường', color: '#94a3b8' },
@@ -652,6 +696,27 @@
     return b ? b.set : 'v1';
   }
 
+  /** Tên dễ đọc của một bộ */
+  function setName(set) { return SET_NAMES[set] || ('Bộ ' + set); }
+
+  /** Thân người đầu tiên của một bộ — dùng khi đổi bộ giúp người chơi */
+  function firstBodyOf(set) {
+    const l = byCat('body', set);
+    return l.length ? l[0].id : null;
+  }
+
+  /**
+   * Đổi sang bộ khác nhưng CỐ GIỮ món vừa chọn.
+   * Dùng khi học sinh bấm vào một món thuộc bộ khác: đổi thân người cho khớp,
+   * bỏ các món cũ (vì chúng vẽ theo tỉ lệ thân cũ), giữ đúng món vừa bấm.
+   */
+  function switchSet(outfit, set, keepCat, keepId) {
+    const o = { body: firstBodyOf(set) };
+    CATEGORIES.forEach(function (c) { if (c.key !== 'body') o[c.key] = null; });
+    if (keepCat === 'body') o.body = keepId; else if (keepCat) o[keepCat] = keepId;
+    return o;
+  }
+
   /** Danh sách các bộ đang có, kèm số món */
   function sets() {
     const m = {};
@@ -742,8 +807,10 @@
 
   const API = {
     RIG: RIG, LAYERS: LAYERS, CATEGORIES: CATEGORIES, RARITY: RARITY, ITEMS: ITEMS,
+    SET_NAMES: SET_NAMES,
     get: get, byCat: byCat, defaultOutfit: defaultOutfit, randomOutfit: randomOutfit,
-    setOf: setOf, sets: sets, fixSet: fixSet,
+    setOf: setOf, sets: sets, fixSet: fixSet, setName: setName,
+    firstBodyOf: firstBodyOf, switchSet: switchSet,
     pack: pack, unpack: unpack, renderSVG: renderSVG
   };
 
@@ -1118,28 +1185,57 @@
 
         function buildItems() {
             const c = L.CATEGORIES.find(x => x.key === cat);
-            // Tông da quyết định "bộ"; các loại khác chỉ hiện đồ cùng bộ,
-            // vì đồ khác bộ vẽ theo tỉ lệ đầu-thân khác nên đội vào là lệch.
-            const list = cat === 'body' ? L.byCat(cat) : L.byCat(cat, L.setOf(outfit));
+            const mySet = L.setOf(outfit);
+            // Hiện HẾT mọi món. Món khác bộ thì làm mờ + ghi rõ, bấm vào sẽ tự
+            // đổi bộ giúp — chứ ẩn đi thì thêm đồ mới vào mà không ai thấy.
+            const list = L.byCat(cat);
             let html = '';
             if (!c.required) {
                 html += '<div class="it' + (!outfit[cat] ? ' on' : '') + '" data-id=""><div style="height:56px;display:flex;align-items:center;justify-content:center;font-size:24px;opacity:.5">🚫</div><div class="n">Không dùng</div></div>';
             }
             html += list.map(function (i) {
-                const o = { body: outfit.body || 'body_light' }; o[i.cat] = i.id;
+                const alt = i.set !== mySet;
+                // xem thử trên đúng thân cùng bộ với món đó, cho khỏi lệch
+                const o = { body: alt ? L.firstBodyOf(i.set) : (outfit.body || 'body_light') };
+                o[i.cat] = i.id;
                 const r = L.RARITY[i.rarity] || L.RARITY.common;
-                return '<div class="it' + (outfit[cat] === i.id ? ' on' : '') + '" data-id="' + i.id + '">' +
+                return '<div class="it' + (outfit[cat] === i.id ? ' on' : '') + (alt ? ' alt' : '') +
+                    '" data-id="' + i.id + '" data-set="' + i.set + '">' +
                     '<span class="r" style="background:' + r.color + '"></span>' +
-                    L.renderSVG(o, { size: 76 }) + '<div class="n">' + i.name + '</div></div>';
+                    L.renderSVG(o, { size: 76 }) +
+                    '<div class="n">' + i.name + (alt ? '<br><span class="sw">' + L.setName(i.set) + '</span>' : '') +
+                    '</div></div>';
             }).join('');
             $('items').innerHTML = html;
             $('items').querySelectorAll('.it').forEach(function (el) {
                 el.onclick = function () {
-                    outfit[cat] = el.dataset.id || null;
-                    if (cat === 'body') outfit = L.fixSet(outfit);   // đổi bộ -> bỏ đồ lạc bộ
+                    const id = el.dataset.id || null;
+                    const s = el.dataset.set;
+                    if (id && s && s !== L.setOf(outfit)) {
+                        // Món thuộc bộ khác: đổi cả thân người cho khớp tỉ lệ
+                        outfit = L.switchSet(outfit, s, cat, id);
+                        toast('Đã đổi sang ' + L.setName(s) + ' — đồ cũ khác bộ nên phải chọn lại');
+                    } else {
+                        outfit[cat] = id;
+                        if (cat === 'body') outfit = L.fixSet(outfit);
+                    }
                     buildItems(); drawPreview(); pushOutfit();
                 };
             });
+        }
+
+        let toastTimer = null;
+        function toast(msg) {
+            let t = document.getElementById('toast');
+            if (!t) {
+                t = document.createElement('div');
+                t.id = 'toast';
+                document.body.appendChild(t);
+            }
+            t.textContent = msg;
+            t.classList.add('on');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () { t.classList.remove('on'); }, 2600);
         }
 
         function buildPicker() { buildTabs(); buildItems(); drawPreview(); }
