@@ -352,6 +352,67 @@
             animation: d 1.4s steps(4, end) infinite
         }
 
+        /* ===== rủ bạn tương tác ===== */
+        .sheet {
+            position: fixed;
+            inset: 0;
+            background: rgba(6, 4, 20, .72);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: flex-end;
+            z-index: 900
+        }
+
+        .sheet.on {
+            display: flex
+        }
+
+        .sheet .box {
+            background: #171243;
+            border-top: 1px solid var(--line);
+            border-radius: 22px 22px 0 0;
+            padding: 22px 18px max(22px, env(safe-area-inset-bottom));
+            width: 100%
+        }
+
+        .sheet h3 {
+            margin: 0 0 4px;
+            font-size: 19px
+        }
+
+        .sheet p {
+            margin: 0 0 18px;
+            color: var(--dim);
+            font-size: 13.5px
+        }
+
+        .sheet .acts {
+            display: flex;
+            gap: 12px
+        }
+
+        .sheet .acts button {
+            flex: 1;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, .07);
+            color: var(--tx);
+            border-radius: 18px;
+            padding: 16px 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer
+        }
+
+        .sheet .acts button span {
+            display: block;
+            font-size: 30px;
+            margin-bottom: 6px
+        }
+
+        .sheet .acts button:active {
+            transform: scale(.96)
+        }
+
         /* ===== màn làm bài ===== */
         #s4 {
             padding-top: max(10px, env(safe-area-inset-top))
@@ -643,7 +704,22 @@
         </div>
         <div id="stage"></div>
         <p class="waiting"><span id="waitMsg" class="dots">Chờ thầy cô bắt đầu</span></p>
+        <p class="waiting" id="ixHint" style="opacity:.72;margin-top:-4px">👆 Bấm vào nhân vật của bạn để 💖 ôm hoặc
+            💥 tỉ thí</p>
         <div class="emotes" id="emotes"></div>
+    </div>
+
+    <!-- ===== RỦ BẠN TƯƠNG TÁC ===== -->
+    <div class="sheet" id="ixSheet">
+        <div class="box">
+            <h3 id="ixName">Bạn</h3>
+            <p>Chọn kiểu tương tác — cả lớp sẽ thấy trên màn hình lớn</p>
+            <div class="acts">
+                <button data-k="love"><span>💖</span>Ôm hôn</button>
+                <button data-k="fight"><span>💥</span>Tỉ thí</button>
+                <button data-k=""><span>✖️</span>Thôi</button>
+            </div>
+        </div>
     </div>
 
     <!-- ===== 4. LÀM BÀI ===== -->
@@ -1164,7 +1240,33 @@
   20%{transform:translate(-50%,-100%) scale(1.25)}
   35%{transform:translate(-50%,-100%) scale(1)}
   80%{opacity:1}100%{transform:translate(-50%,-190%) scale(1);opacity:0}}
+
+/* ----- hai nhân vật tương tác với nhau ----- */
+.ls-p.ls-busy .ls-body{opacity:.14;transition:opacity .3s}
+.ls-p.ls-busy .ls-tag{opacity:.55}
+.ls-fx{position:absolute;transform:translateX(-50%);pointer-events:none;text-align:center;
+  display:flex;align-items:center;justify-content:center;line-height:1}
+.ls-fx .ls-icon{animation:lsFx 5s ease-out forwards;filter:drop-shadow(0 8px 18px rgba(0,0,0,.5))}
+@keyframes lsFx{0%{transform:scale(.2) rotate(-12deg);opacity:0}
+  12%{transform:scale(1.18) rotate(4deg);opacity:1}
+  20%{transform:scale(1) rotate(0)}
+  88%{transform:scale(1) rotate(0);opacity:1}
+  100%{transform:scale(1.3);opacity:0}}
+/* trái tim đập, còn nắm đấm thì rung bần bật */
+.ls-fx.love .ls-icon{animation:lsFx 5s ease-out forwards,lsBeat 1s ease-in-out .3s infinite}
+@keyframes lsBeat{0%,100%{scale:1}30%{scale:1.12}60%{scale:.97}}
+.ls-fx.fight .ls-icon{animation:lsFx 5s ease-out forwards,lsShake .12s linear .3s infinite}
+@keyframes lsShake{0%,100%{translate:0 0}25%{translate:-4% -2%}50%{translate:3% 2%}75%{translate:-2% 3%}}
+.ls-fx .ls-spark{position:absolute;inset:-18%;border-radius:50%;opacity:.5;
+  background:radial-gradient(closest-side,rgba(255,255,255,.55),transparent 70%);
+  animation:lsPuff 5s ease-out forwards}
+.ls-fx.love .ls-spark{background:radial-gradient(closest-side,rgba(255,120,190,.6),transparent 70%)}
+.ls-fx.fight .ls-spark{background:radial-gradient(closest-side,rgba(255,190,90,.6),transparent 70%)}
+@keyframes lsPuff{0%{transform:scale(.3);opacity:0}18%{transform:scale(1);opacity:.7}
+  100%{transform:scale(1.25);opacity:0}}
 `;
+
+  const FX_SHOW = 5200;   // hiệu ứng tương tác chạy bao lâu trên MỘT màn hình
 
   let cssDone = false;
   function injectCSS() {
@@ -1224,7 +1326,33 @@
     const emptyEl = el.querySelector('.ls-empty');
 
     const nodes = new Map();   // id -> element
-    let lastList = [];
+    const fxNodes = new Map(); // khoá cặp -> lớp icon trùm lên hai nhân vật
+    const fxDone = new Map();  // khoá cặp -> lúc hiệu ứng hết hạn trên máy này
+    const localIx = new Map(); // id người rủ -> màn tương tác do CHÍNH MÁY NÀY khơi ra
+    let lastList = [], fxTimer = null;
+
+    /**
+     * Trộn màn tương tác "tự vẽ trước" của máy này vào danh sách nhận từ máy chủ.
+     *
+     * Bấm xong mà ngồi chờ Apps Script trả lời rồi mới vẽ thì mất khoảng 3 giây —
+     * lâu tới mức em nào cũng tưởng bấm hụt và bấm lại. Nên máy tự vẽ ngay, còn
+     * lượt gọi kia cứ đi đường của nó để các máy khác biết.
+     *
+     * Sau khi diễn xong, tin của MÁY CHỦ về đúng màn đó bị nuốt trong 25 giây
+     * (`until`) — nếu không thì lát nữa nó vọng về và trái tim nở thêm lần nữa,
+     * vì dấu thời gian của máy chủ khác dấu thời gian máy này nên bị coi là màn mới.
+     */
+    function withLocalIx(list) {
+      const now = Date.now();
+      localIx.forEach(function (v, k) { if (now > v.until) localIx.delete(k); });
+      if (!localIx.size) return list;
+      return list.map(function (p) {
+        const v = localIx.get(p.id);
+        if (!v) return p;
+        const mine = now < v.t + FX_SHOW ? { w: v.w, k: v.k, t: v.t } : null;
+        return Object.assign({}, p, { ix: mine });
+      });
+    }
 
     // Đổi cỡ cửa sổ / xoay ngang điện thoại -> xếp lại chỗ đứng
     let relayout = null;
@@ -1241,12 +1369,18 @@
       d.innerHTML = '<div class="ls-dust"><i></i><i></i><i></i></div>' +
         '<div class="ls-tag"></div><div class="ls-body"></div>';
       d.querySelector('.ls-body').style.animationDelay = (-hash(p.id) * 2.6).toFixed(2) + 's';
+      // Bấm vào nhân vật để rủ tương tác (chỉ trang học sinh truyền onPick vào)
+      if (opt.onPick) {
+        d.style.cursor = 'pointer';
+        d.onclick = function () { if (d.__p) opt.onPick(d.__p); };
+      }
       el.appendChild(d);
       setTimeout(function () { d.classList.remove('ls-new'); }, 1400);
       return d;
     }
 
     function paint(node, p) {
+      node.__p = p;                 // luôn giữ bản mới nhất cho tay bấm ở trên
       const tag = node.querySelector('.ls-tag');
       if (tag.textContent !== p.name) tag.textContent = p.name;
       const key = L.pack(p.outfit && typeof p.outfit === 'object' ? p.outfit : L.unpack(p.outfit));
@@ -1264,27 +1398,124 @@
       }
     }
 
-    function sync(list) {
-      list = list || [];
-      lastList = list;
+    /**
+     * Ghép đôi những em đang tương tác. Máy chủ chỉ ghi ý định lên NGƯỜI RỦ
+     * (`p.ix = {w: id bạn kia, k: 'love'|'fight', t}`), phía đây tự tìm bạn kia.
+     * Mỗi em chỉ nằm trong MỘT cặp — hai em cùng rủ một người thì ai gửi trước
+     * được ghép, người sau bị bỏ qua, chứ không thì một nhân vật bị kéo về hai
+     * phía cùng lúc.
+     */
+    /**
+     * Lọc ra những cặp CÒN ĐANG DIỄN trên đúng màn hình này.
+     *
+     * Máy chủ giữ tin tương tác tới 22 giây để máy nào hỏi thưa cũng nhận được,
+     * nhưng hiệu ứng chỉ nên chạy 5 giây. Nên thời gian diễn do MÁY NÀY tự đếm
+     * từ lúc nó nhìn thấy, chứ không lấy hiệu số với `ix.t`: `ix.t` là giờ của
+     * máy chủ Google, còn đồng hồ điện thoại học sinh lệch cả phút là chuyện
+     * thường — trừ nhau ra thì hiệu ứng khi thì không hiện, khi thì dính mãi.
+     */
+    function livePairs(list) {
+      const now = Date.now();
+      fxDone.forEach(function (end, k) { if (now - end > 120000) fxDone.delete(k); });
+      return pairsOf(list).filter(function (pr) {
+        const end = fxDone.get(pr.key);
+        if (end === undefined) { fxDone.set(pr.key, now + FX_SHOW); return true; }
+        return now < end;
+      });
+    }
+
+    function pairsOf(list) {
+      const byId = new Map(list.map(p => [p.id, p]));
+      const used = new Set(), out = [];
+      list.slice().sort((a, b) => (a.ix ? a.ix.t : 0) - (b.ix ? b.ix.t : 0)).forEach(function (p) {
+        if (!p.ix || used.has(p.id)) return;
+        const q = byId.get(p.ix.w);
+        if (!q || q.id === p.id || used.has(q.id)) return;
+        used.add(p.id); used.add(q.id);
+        out.push({ a: p, b: q, kind: p.ix.k, t: p.ix.t, key: p.id + '|' + p.ix.t });
+      });
+      return out;
+    }
+
+    /** Xếp lại thứ tự để hai em trong cặp đứng liền nhau (thường là cùng hàng). */
+    function orderFor(list, pairs) {
+      if (!pairs.length) return list;
+      const byId = new Map(list.map(p => [p.id, p]));
+      const mate = new Map();
+      pairs.forEach(pr => { mate.set(pr.a.id, pr.b.id); mate.set(pr.b.id, pr.a.id); });
+      const done = new Set(), out = [];
+      list.forEach(function (p) {
+        if (done.has(p.id)) return;
+        out.push(p); done.add(p.id);
+        const m = mate.get(p.id);
+        if (m && !done.has(m) && byId.has(m)) { out.push(byId.get(m)); done.add(m); }
+      });
+      return out;
+    }
+
+    function sync(raw) {
+      lastList = raw || [];
+      const list = withLocalIx(lastList);
       emptyEl.style.display = list.length ? 'none' : 'flex';
 
       const W = el.clientWidth || 800, H = el.clientHeight || 400;
+      const pairs = livePairs(list);
+      const order = orderFor(list, pairs);
+      const busy = new Set();
+      pairs.forEach(pr => { busy.add(pr.a.id); busy.add(pr.b.id); });
+
+      // Tính chỗ đứng trước, dồn cặp lại sau, rồi mới vẽ — chứ vẽ ngay trong
+      // vòng lặp thì lúc dồn cặp phải sờ lại DOM lần nữa.
+      const geo = new Map();
+      order.forEach(function (p, i) {
+        const g = layoutOf(i, order.length, W, H);
+        g.left += (hash(p.id + 'x') - .5) * g.size * 0.10;
+        geo.set(p.id, g);
+      });
+
+      pairs.forEach(function (pr) {
+        const ga = geo.get(pr.a.id), gb = geo.get(pr.b.id);
+        if (!ga || !gb) return;
+        // Kéo hai em xáp vào nhau quanh điểm giữa, hơi chồng lên nhau một chút
+        const mid = (ga.left + gb.left) / 2, size = Math.max(ga.size, gb.size);
+        const near = size * 0.32;
+        const aFirst = ga.left <= gb.left;          // giữ nguyên ai đang đứng bên nào
+        ga.left = mid + (aFirst ? -near : near);
+        gb.left = mid + (aFirst ? near : -near);
+        pr.mid = mid;
+        pr.bottom = Math.min(ga.bottom, gb.bottom);
+        pr.size = size;
+        ga.z = gb.z = Math.max(ga.z, gb.z);
+      });
+
       const seen = new Set();
-      list.forEach(function (p, i) {
+      order.forEach(function (p) {
         seen.add(p.id);
         let node = nodes.get(p.id);
         if (!node) { node = makeNode(p); nodes.set(p.id, node); }
         paint(node, p);
-        const g = layoutOf(i, list.length, W, H);
-        const jitter = (hash(p.id + 'x') - .5) * g.size * 0.10;
-        node.style.left = Math.round(g.left + jitter) + 'px';
+        const g = geo.get(p.id);
+        node.style.left = Math.round(g.left) + 'px';
         node.style.bottom = Math.round(g.bottom) + 'px';
         node.style.width = Math.round(g.size) + 'px';
         node.style.zIndex = g.z + (p.id === opt.meId ? 500 : 0);
+        node.classList.toggle('ls-busy', busy.has(p.id));
         node.querySelector('.ls-tag').style.fontSize =
           Math.max(9, Math.min(17, g.size * 0.115)).toFixed(1) + 'px';
       });
+
+      syncFx(pairs);
+
+      // Sân khấu chỉ vẽ lại mỗi khi có tin mới từ máy chủ, mà điện thoại có
+      // lúc 20 giây mới hỏi một lần. Không tự hẹn giờ thì hiệu ứng 5 giây sẽ
+      // dính trên màn hình tới tận lượt hỏi sau — hẹn giờ ở đây là việc trong
+      // máy, không tốn thêm lượt gọi nào.
+      clearTimeout(fxTimer);
+      if (pairs.length) {
+        let soonest = Infinity;
+        pairs.forEach(function (pr) { soonest = Math.min(soonest, fxDone.get(pr.key) - Date.now()); });
+        fxTimer = setTimeout(function () { sync(lastList); }, Math.max(150, soonest + 60));
+      }
 
       nodes.forEach(function (node, id) {
         if (seen.has(id)) return;
@@ -1294,11 +1525,54 @@
       });
     }
 
+    /** Trùm icon lên cặp đang tương tác, che kín cả hai nhân vật. */
+    function syncFx(pairs) {
+      const alive = new Set();
+      pairs.forEach(function (pr) {
+        alive.add(pr.key);
+        let fx = fxNodes.get(pr.key);
+        if (!fx) {
+          fx = document.createElement('div');
+          fx.className = 'ls-fx ' + (pr.kind === 'fight' ? 'fight' : 'love');
+          fx.innerHTML = '<div class="ls-spark"></div><div class="ls-icon">' +
+            (pr.kind === 'fight' ? '💥' : '💖') + '</div>';
+          el.appendChild(fx);
+          fxNodes.set(pr.key, fx);
+          if (opt.onInteract) opt.onInteract(pr);
+        }
+        // Hai em đã xáp lại còn cách nhau ~0,64 lần cỡ nhân vật, nên bề ngang
+        // cặp cỡ 1,6 lần. Icon lấy hơn thế một chút để trùm kín cả hai.
+        fx.style.left = Math.round(pr.mid) + 'px';
+        fx.style.bottom = Math.round(pr.bottom + pr.size * 0.06) + 'px';
+        fx.style.width = Math.round(pr.size * 1.9) + 'px';
+        fx.style.height = Math.round(pr.size * 1.05) + 'px';
+        fx.style.fontSize = Math.round(pr.size * 1.05) + 'px';
+        fx.style.zIndex = 900;
+      });
+      fxNodes.forEach(function (fx, key) {
+        if (alive.has(key)) return;
+        fxNodes.delete(key);
+        fx.remove();
+      });
+    }
+
     return {
       el: el,
       sync: sync,
       count: function () { return lastList.length; },
-      setMe: function (id) { opt.meId = id; sync(lastList); }
+      setMe: function (id) { opt.meId = id; sync(lastList); },
+
+      /** Vẽ ngay màn tương tác vừa bấm, không chờ máy chủ trả lời. */
+      playLocal: function (fromId, toId, kind) {
+        const t = Date.now();
+        localIx.set(fromId, { w: toId, k: kind, t: t, until: t + 25000 });
+        sync(lastList);
+      },
+      /** Máy chủ từ chối thì rút lại màn vừa vẽ. */
+      cancelLocal: function (fromId) {
+        if (!localIx.delete(fromId)) return;
+        sync(lastList);
+      }
     };
   }
 
@@ -1328,8 +1602,8 @@
   if (!ep && typeof location !== 'undefined') {
     try { ep = new URLSearchParams(location.search).get('api') || ''; } catch (e) { }
   }
-  const ENDPOINT = ep || '/live';
-  const IS_GAS = /script\.google\.com/.test(ENDPOINT);
+  let ENDPOINT = ep || '/live';
+  let IS_GAS = /script\.google\.com/.test(ENDPOINT);
 
   function call(action, payload) {
     const body = JSON.stringify(Object.assign({ action: action }, payload || {}));
@@ -1395,12 +1669,29 @@
     call: call,
     Poller: Poller,
 
+    /**
+     * Đổi chỗ chạy phòng ngay giữa chừng (màn hình lớp gọi khi bật đường hầm).
+     * Nhớ tạo lại Poller sau khi gọi: nhịp hỏi được chốt lúc tạo, mà chạy tại
+     * máy thì hỏi dày gấp năm lần chạy trên Google.
+     */
+    use: function (endpoint) {
+      ENDPOINT = endpoint || '/live';
+      IS_GAS = /script\.google\.com/.test(ENDPOINT);
+      root.LiveNet.endpoint = ENDPOINT;
+      root.LiveNet.isGAS = IS_GAS;
+      return ENDPOINT;
+    },
+
     createRoom: function (title, quizId) { return call('liveCreate', { title: title, quizId: quizId || '' }); },
     join: function (pin, name, outfit) { return call('liveJoin', { pin: pin, name: name, outfit: outfit }); },
     update: function (pin, playerId, outfit, name) { return call('liveUpdate', { pin: pin, playerId: playerId, outfit: outfit, name: name }); },
     leave: function (pin, playerId) { return call('liveLeave', { pin: pin, playerId: playerId }); },
     hostCmd: function (pin, token, cmd, arg) { return call('liveHost', { pin: pin, hostToken: token, cmd: cmd, arg: arg || '' }); },
     emote: function (pin, playerId, emote) { return call('liveEmote', { pin: pin, playerId: playerId, emote: emote }); },
+    /** kind: 'love' (ôm hôn) hoặc 'fight' (tỉ thí) */
+    interact: function (pin, playerId, target, kind) {
+      return call('liveInteract', { pin: pin, playerId: playerId, target: target, kind: kind });
+    },
 
     /* ---- giai đoạn làm bài ---- */
     setQuiz: function (pin, token, quiz) { return call('liveSetQuiz', { pin: pin, hostToken: token, quiz: quiz }); },
@@ -1843,7 +2134,10 @@
         /* ---------- 3. sân khấu ---------- */
         function startStage() {
             show('s3');
-            stage = LiveStage.mount($('stage'), { meId: MYID, emptyText: 'Đang lên sân khấu…' });
+            stage = LiveStage.mount($('stage'), {
+                meId: MYID, emptyText: 'Đang lên sân khấu…',
+                onPick: askInteract
+            });
             $('emotes').innerHTML = ['👍', '😂', '🔥', '❤️', '😮'].map(e =>
                 '<button data-e="' + e + '">' + e + '</button>').join('');
             let lastEmote = 0;
@@ -1860,6 +2154,10 @@
                 CLASS_N = Math.max(1, players.length);
                 $('rCount').textContent = players.length + ' người';
                 if (d.title) $('rTitle').textContent = d.title;
+                if (typeof d.fx === 'boolean') {
+                    ixOn = d.fx;
+                    $('ixHint').style.display = d.fx && players.length > 1 ? '' : 'none';
+                }
                 if (!players.some(p => p.id === MYID)) {
                     $('waitMsg').className = ''; $('waitMsg').textContent = '⚠️ Em đã bị mời ra khỏi phòng.';
                 } else if (d.status === 'playing') {
@@ -1878,6 +2176,46 @@
         }
 
         $('editBtn').onclick = function () { buildPicker(); show('s2'); };
+
+        /* ---------- rủ bạn tương tác ----------
+           Bấm vào nhân vật của bạn trên sân khấu -> chọn 💖 hoặc 💥.
+           Không hỏi ý bạn kia: hỏi thì tốn gấp đôi lượt gọi mà lại hết vui vì
+           phải chờ. Bù lại thầy cô có công tắc tắt hẳn phần này. */
+        let ixTarget = null, ixLast = 0, ixOn = true;
+
+        function askInteract(p) {
+            if (!p || p.id === MYID || !joined) return;
+            if (!ixOn) return toast('Thầy cô đang tắt phần tương tác.');
+            if (Date.now() - ixLast < 4000) return toast('Em chờ một chút rồi rủ tiếp nhé.');
+            ixTarget = p;
+            $('ixName').textContent = p.name;
+            $('ixSheet').classList.add('on');
+        }
+
+        $('ixSheet').querySelectorAll('.acts button').forEach(function (b) {
+            b.onclick = function () {
+                const kind = b.dataset.k;
+                $('ixSheet').classList.remove('on');
+                if (!kind || !ixTarget) return;
+                if (navigator.vibrate) navigator.vibrate(20);
+                ixLast = Date.now();
+                const name = ixTarget.name, id = ixTarget.id;
+                // Vẽ ngay tại máy. Chờ Apps Script trả lời rồi mới vẽ là mất
+                // khoảng 3 giây — lâu tới mức em nào cũng tưởng bấm hụt.
+                if (stage) stage.playLocal(MYID, id, kind);
+                LiveNet.interact(PIN, MYID, id, kind)
+                    .then(function () {
+                        toast((kind === 'love' ? '💖 Đã ôm ' : '💥 Đang tỉ thí với ') + name);
+                        if (poller) poller.refreshNow();
+                    })
+                    .catch(function (e) {
+                        if (stage) stage.cancelLocal(MYID);      // máy chủ không nhận thì rút lại
+                        toast(e.message || 'Không rủ được, thử lại nhé.');
+                    });
+                ixTarget = null;
+            };
+        });
+        $('ixSheet').onclick = function (e) { if (e.target === this) this.classList.remove('on'); };
 
         window.addEventListener('beforeunload', function () {
             if (poller) poller.stop();
