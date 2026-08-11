@@ -352,6 +352,241 @@
             animation: d 1.4s steps(4, end) infinite
         }
 
+        /* ===== màn làm bài ===== */
+        #s4 {
+            padding-top: max(10px, env(safe-area-inset-top))
+        }
+
+        .qtop {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 13.5px;
+            color: var(--dim)
+        }
+
+        .qtop b {
+            color: var(--tx);
+            font-size: 17px
+        }
+
+        .timer {
+            height: 7px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, .12);
+            overflow: hidden;
+            margin: 9px 0 4px
+        }
+
+        .timer i {
+            display: block;
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #6ee7a8, #ffd76a);
+            transform-origin: left
+        }
+
+        .timer.low i {
+            background: linear-gradient(90deg, #ff8a5c, #ff5d7e)
+        }
+
+        .qbody {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 10px 2px
+        }
+
+        .qctx {
+            background: rgba(255, 255, 255, .06);
+            border-left: 3px solid var(--acc);
+            border-radius: 0 12px 12px 0;
+            padding: 10px 13px;
+            font-size: 14px;
+            color: #d9d4ff
+        }
+
+        .qtext {
+            font-size: 19px;
+            font-weight: 700;
+            line-height: 1.45
+        }
+
+        .qtext img,
+        .qrev img {
+            max-width: 100%;
+            border-radius: 12px
+        }
+
+        .opts {
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        .opt {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            text-align: left;
+            background: rgba(255, 255, 255, .07);
+            border: 1px solid var(--line);
+            color: var(--tx);
+            border-radius: 16px;
+            padding: 14px;
+            font-size: 16.5px;
+            min-height: 58px;
+            cursor: pointer;
+            transition: transform .12s, background .18s
+        }
+
+        .opt:active {
+            transform: scale(.98)
+        }
+
+        .opt.pick {
+            background: linear-gradient(135deg, var(--acc), var(--acc2));
+            border-color: transparent;
+            font-weight: 700
+        }
+
+        .opt .k {
+            flex: 0 0 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, .35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900
+        }
+
+        .opt.tf {
+            justify-content: center;
+            font-size: 19px;
+            font-weight: 800
+        }
+
+        .streak {
+            position: absolute;
+            left: 50%;
+            top: 38%;
+            transform: translate(-50%, -50%) scale(.4);
+            font-size: 34px;
+            font-weight: 900;
+            opacity: 0;
+            pointer-events: none;
+            text-shadow: 0 6px 22px rgba(0, 0, 0, .6)
+        }
+
+        .streak.go {
+            animation: pop 1s ease-out
+        }
+
+        @keyframes pop {
+            15% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.15)
+            }
+
+            70% {
+                opacity: 1;
+                transform: translate(-50%, -60%) scale(1)
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -110%) scale(.9)
+            }
+        }
+
+        /* ===== màn kết quả ===== */
+        #s5 .big {
+            text-align: center;
+            padding: 8px 0 4px
+        }
+
+        #s5 .big .sc {
+            font-size: 52px;
+            font-weight: 900;
+            line-height: 1.1;
+            background: linear-gradient(120deg, #fff, #b9a6ff, #ff9ecb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent
+        }
+
+        #s5 .big .rk {
+            font-size: 15px;
+            color: var(--dim)
+        }
+
+        .top5 {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin: 12px 0
+        }
+
+        .top5 div {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, .06);
+            border-radius: 10px;
+            padding: 7px 12px;
+            font-size: 14px
+        }
+
+        .top5 div.me {
+            background: linear-gradient(90deg, rgba(124, 92, 255, .5), rgba(255, 93, 158, .28));
+            font-weight: 700
+        }
+
+        .qrev {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-bottom: 8px
+        }
+
+        .qrev .c {
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid var(--line);
+            border-left: 4px solid #6ee7a8;
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 14.5px
+        }
+
+        .qrev .c.bad {
+            border-left-color: #ff5d7e
+        }
+
+        .qrev .c .h {
+            font-weight: 700;
+            margin-bottom: 6px
+        }
+
+        .qrev .c .a {
+            color: var(--dim);
+            font-size: 13.5px;
+            margin-top: 5px
+        }
+
+        .qrev .c .x {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--line);
+            font-size: 13.5px;
+            color: #d9d4ff
+        }
+
         @keyframes d {
             0% {
                 content: ''
@@ -409,6 +644,33 @@
         <div id="stage"></div>
         <p class="waiting"><span id="waitMsg" class="dots">Chờ thầy cô bắt đầu</span></p>
         <div class="emotes" id="emotes"></div>
+    </div>
+
+    <!-- ===== 4. LÀM BÀI ===== -->
+    <div class="screen" id="s4">
+        <div class="qtop">
+            <span>Câu <b id="qNo">1</b> / <span id="qTot">10</span></span>
+            <span id="qStreak"></span>
+            <span>Điểm <b id="qScore">0</b></span>
+        </div>
+        <div class="timer" id="qTimer"><i></i></div>
+        <div class="qbody">
+            <div class="qctx" id="qCtx" style="display:none"></div>
+            <div class="qtext" id="qText">…</div>
+            <div class="opts" id="qOpts"></div>
+        </div>
+        <div class="streak" id="qPop"></div>
+    </div>
+
+    <!-- ===== 5. KẾT QUẢ ===== -->
+    <div class="screen" id="s5">
+        <div class="big">
+            <div class="sc" id="rScore">0</div>
+            <div class="rk" id="rRank">Đang gửi kết quả…</div>
+        </div>
+        <div class="top5" id="rTop"></div>
+        <div class="qrev" id="rRev"></div>
+        <button class="btn ghost" id="rAgain">🔄 Xem lại thứ hạng</button>
     </div>
 
     <script>window.LIVE_ENDPOINT = "https://script.google.com/macros/s/AKfycbxn39tDwvyGq6rn4AXWv_1YicZYREIwNuaMD95dnZz3DkMlcr1t2CMnw_7Nl7HhaH0Raw/exec";</script>
@@ -1138,8 +1400,309 @@
     update: function (pin, playerId, outfit, name) { return call('liveUpdate', { pin: pin, playerId: playerId, outfit: outfit, name: name }); },
     leave: function (pin, playerId) { return call('liveLeave', { pin: pin, playerId: playerId }); },
     hostCmd: function (pin, token, cmd, arg) { return call('liveHost', { pin: pin, hostToken: token, cmd: cmd, arg: arg || '' }); },
-    emote: function (pin, playerId, emote) { return call('liveEmote', { pin: pin, playerId: playerId, emote: emote }); }
+    emote: function (pin, playerId, emote) { return call('liveEmote', { pin: pin, playerId: playerId, emote: emote }); },
+
+    /* ---- giai đoạn làm bài ---- */
+    setQuiz: function (pin, token, quiz) { return call('liveSetQuiz', { pin: pin, hostToken: token, quiz: quiz }); },
+    getQuiz: function (pin) { return call('liveQuiz', { pin: pin }); },
+    results: function (pin, token) { return call('liveResults', { pin: pin, hostToken: token }); },
+
+    /** p = { sc, an, ok, ms, done, det } — xem Progress bên dưới, đừng gọi tay. */
+    progress: function (pin, playerId, p) {
+      return call('liveProgress', Object.assign({ pin: pin, playerId: playerId }, p || {}));
+    }
   };
+
+  /**
+   * Nhịp báo điểm của học sinh.
+   *
+   * Trong lúc làm bài, trang học sinh KHÔNG hỏi trạng thái phòng nữa — nó chỉ
+   * báo điểm về, và chính câu trả lời của lượt báo đó mang sẵn thứ hạng.
+   * Mỗi em một lượt gọi mỗi `every` giây, chứ báo sau từng câu thì 35 em × 20
+   * câu = 700 lượt, ăn đứt hạn mức 90 phút/ngày chỉ trong một buổi.
+   *
+   *   const rep = LiveNet.Reporter(pin, id, onRank);
+   *   rep.push({sc, an, ok, ms});   // gọi thoải mái sau mỗi câu, tự dồn lại
+   *   rep.finish({...});            // nộp bài -> gửi ngay, không chờ
+   */
+  function Reporter(pin, playerId, onRank, opt) {
+    opt = opt || {};
+    const every = (opt.every || (IS_GAS ? 25 : 4)) * 1000;
+    let last = 0, pending = null, timer = null, sending = false, stopped = false;
+
+    function send(now) {
+      if (stopped || sending || !pending) return;
+      if (!now && Date.now() - last < every) return schedule();
+      const body = pending; pending = null; sending = true; last = Date.now();
+      root.LiveNet.progress(pin, playerId, body)
+        .then(function (d) { if (onRank) onRank(d); })
+        .catch(function () { if (!pending) pending = body; })   // hụt thì để lượt sau gửi lại
+        .then(function () { sending = false; schedule(); });
+    }
+    function schedule() {
+      clearTimeout(timer);
+      if (stopped || !pending) return;
+      // Bài đã nộp thì gửi ngay: cả lớp đang nhìn bảng xếp hạng trên máy chiếu
+      const wait = pending.done ? 300 : Math.max(300, every - (Date.now() - last));
+      timer = setTimeout(function () { send(true); }, wait);
+    }
+
+    return {
+      push: function (body) { pending = body; send(false); },
+      finish: function (body) { pending = Object.assign({}, body, { done: true }); send(true); },
+      stop: function () { stopped = true; clearTimeout(timer); }
+    };
+  }
+  root.LiveNet.Reporter = Reporter;
+
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+    <script>
+/* === live_quiz.js === */
+/* =====================================================================
+ *  LIVE QUIZ — bộ đề cho phòng chơi trực tiếp
+ *  ---------------------------------------------------------------
+ *  Dùng chung cho HAI trang:
+ *    · live_host.html   — lọc câu từ ngân hàng rồi đóng gói bộ đề
+ *    · live_player.html — chấm bài và tính điểm ngay trên máy học sinh
+ *
+ *  Ngân hàng câu hỏi GIỮ NGUYÊN: vẫn là sheet `questionbank` của trang
+ *  Quản lý câu hỏi, đọc qua đúng action `get_sheet_data` cũ. Ở đây chỉ
+ *  DỊCH các dòng đó sang một dạng gọn hơn để nhét vừa bộ nhớ đệm.
+ *
+ *  Vì sao khoá lại viết tắt (q, o, a, x…): cả bộ đề phải nằm lọt trong
+ *  một ô CacheService của Apps Script (100KB/ô). Đặt tên dài kiểu
+ *  "question"/"options" thì riêng tên khoá đã ngốn vài KB cho 25 câu.
+ *
+ *  CHẤM BÀI CHẠY Ở MÁY HỌC SINH — nghĩa là đáp án có nằm trong máy các em.
+ *  Đây là đánh đổi có chủ ý: chấm ở máy chủ thì mỗi câu của mỗi em là một
+ *  lượt gọi Apps Script (35 em × 20 câu = 700 lượt ≈ 15 phút hạn mức cho
+ *  MỘT buổi), trong khi hạn mức cả ngày chỉ có 90 phút. Kahoot/Quizizz
+ *  cũng gửi đáp án xuống máy chơi. Em nào mở được công cụ nhà phát triển
+ *  thì xem trộm được — chơi vui trên lớp thì chấp nhận, còn kiểm tra lấy
+ *  điểm thật thì vẫn dùng đường phát đề như cũ.
+ * ===================================================================== */
+
+(function (root) {
+    'use strict';
+
+    // Ảnh trong ngân hàng nằm ở sheet riêng dưới dạng base64 (xem `uploadImage`
+    // trong script quản lý). Kéo về rồi nhét vào bộ đề thì vỡ ngay giới hạn
+    // 100KB, nên câu có ảnh bị bỏ qua — và báo rõ số lượng cho giáo viên.
+    var IMG_REF = /img:[a-z0-9]+/i;
+
+    var DEFAULT_LIMIT = 30;      // giây cho mỗi câu
+    var BASE_POINT = 100;      // trả lời đúng
+    var SPEED_POINT = 100;      // thưởng thêm tối đa cho tốc độ
+    var STREAK_POINT = 10;       // mỗi câu đúng liên tiếp
+    var STREAK_MAX = 50;
+
+    function txt(v) { return v === null || v === undefined ? '' : String(v); }
+    function clean(v) { return txt(v).trim(); }
+
+    function hasImage(q) {
+        if (q.imageUrl && !/^https?:/i.test(txt(q.imageUrl))) return true;
+        var parts = [q.question, q.groupPrompt, q.explanation];
+        if (Array.isArray(q.options)) parts = parts.concat(q.options);
+        if (Array.isArray(q.subQuestions)) {
+            q.subQuestions.forEach(function (s) {
+                if (s.imageUrl && !/^https?:/i.test(txt(s.imageUrl))) parts.push('img:x');
+                parts.push(s.question, s.explanation);
+            });
+        }
+        for (var i = 0; i < parts.length; i++) if (IMG_REF.test(txt(parts[i]))) return true;
+        return false;
+    }
+
+    /** Đáp án câu nhiều lựa chọn có thể là số 0-3, chuỗi "2", hoặc chữ "B". */
+    function mcIndex(raw, options) {
+        var s = clean(raw);
+        if (s === '') return -1;
+        if (/^[0-9]+$/.test(s)) return Number(s);
+        if (/^[A-Ha-h]$/.test(s)) return s.toUpperCase().charCodeAt(0) - 65;
+        // Có ngân hàng ghi thẳng nội dung đáp án đúng
+        for (var i = 0; i < options.length; i++) if (clean(options[i]) === s) return i;
+        return -1;
+    }
+
+    function toBool(raw) {
+        if (typeof raw === 'boolean') return raw;
+        var s = clean(raw).toUpperCase();
+        if (s === 'TRUE' || s === 'ĐÚNG' || s === 'DUNG' || s === '1') return true;
+        if (s === 'FALSE' || s === 'SAI' || s === '0') return false;
+        return null;
+    }
+
+    /**
+     * Một dòng ngân hàng -> 0..n câu trong phòng chơi.
+     * Câu chùm (`group`) được TRẢI RA thành từng ý Đúng/Sai riêng, mỗi ý mang
+     * theo đoạn dẫn chung — chứ bắt học sinh trả lời 4 ý trên một màn hình
+     * điện thoại rồi mới tính điểm thì mất hẳn nhịp game.
+     */
+    function normalize(q) {
+        var out = [];
+        var type = clean(q.type).toLowerCase();
+        var subject = clean(q.subject);
+        var img = /^https?:/i.test(txt(q.imageUrl)) ? clean(q.imageUrl) : '';
+
+        if (type === 'group') {
+            var prompt = clean(q.groupPrompt) || clean(q.question);
+            (q.subQuestions || []).forEach(function (s, i) {
+                var a = toBool(s.answer);
+                if (a === null || !clean(s.question)) return;
+                out.push({
+                    i: clean(s.id) || (clean(q.id) + '_' + i), t: 'tf',
+                    q: clean(s.question), a: a, s: subject,
+                    c: prompt, m: img,
+                    x: clean(s.explanation) || clean(q.explanation)
+                });
+            });
+            return out;
+        }
+
+        if (!clean(q.question)) return out;
+
+        if (type === 'mc') {
+            var opts = Array.isArray(q.options) ? q.options.map(clean).filter(function (o) { return o !== ''; }) : [];
+            if (opts.length < 2) return out;
+            var idx = mcIndex(q.answer, opts);
+            if (idx < 0 || idx >= opts.length) return out;
+            out.push({ i: clean(q.id), t: 'mc', q: clean(q.question), o: opts, a: idx, s: subject, m: img, x: clean(q.explanation) });
+        } else if (type === 'tf') {
+            var b = toBool(q.answer);
+            if (b === null) return out;
+            out.push({ i: clean(q.id), t: 'tf', q: clean(q.question), a: b, s: subject, m: img, x: clean(q.explanation) });
+        } else if (type === 'fib' || type === 'fill' || type === 'short') {
+            var a2 = clean(q.answer);
+            if (a2 === '') return out;
+            out.push({ i: clean(q.id), t: 'fib', q: clean(q.question), a: a2, s: subject, m: img, x: clean(q.explanation) });
+        }
+        return out;
+    }
+
+    /** Xáo trộn tại chỗ (Fisher–Yates). */
+    function shuffle(arr) {
+        for (var i = arr.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+        }
+        return arr;
+    }
+
+    /** Xáo đáp án A/B/C/D nhưng vẫn giữ đúng vị trí đáp án đúng. */
+    function shuffleOptions(item) {
+        if (item.t !== 'mc') return item;
+        var pairs = item.o.map(function (o, i) { return { o: o, right: i === item.a }; });
+        shuffle(pairs);
+        item.o = pairs.map(function (p) { return p.o; });
+        item.a = pairs.findIndex(function (p) { return p.right; });
+        return item;
+    }
+
+    /**
+     * Gom bộ đề từ dữ liệu thô của `get_sheet_data`.
+     * @param {Array} rows  danh sách câu hỏi trả về từ script quản lý
+     * @param {object} opt  { count, subjects, shuffle, shuffleOptions, limit, title }
+     * @returns {{quiz:object, stats:object}}
+     */
+    function build(rows, opt) {
+        opt = opt || {};
+        var stats = { total: 0, image: 0, unusable: 0, taken: 0 };
+        var pool = [];
+
+        (rows || []).forEach(function (q) {
+            if (!q || !clean(q.type)) return;
+            if (clean(q.type).toLowerCase() === 'sub') return;   // đã gộp vào câu chùm
+            stats.total++;
+            if (hasImage(q)) { stats.image++; return; }
+            var items = normalize(q);
+            if (!items.length) { stats.unusable++; return; }
+            pool = pool.concat(items);
+        });
+
+        if (opt.subjects && opt.subjects.length) {
+            pool = pool.filter(function (it) { return opt.subjects.indexOf(it.s) >= 0; });
+        }
+
+        if (opt.shuffle !== false) shuffle(pool);
+        var count = Number(opt.count) || 0;
+        if (count > 0 && pool.length > count) pool = pool.slice(0, count);
+        if (opt.shuffleOptions !== false) pool.forEach(shuffleOptions);
+
+        // Câu không có hướng dẫn giải thì bỏ hẳn khoá `x` cho nhẹ
+        pool.forEach(function (it) {
+            if (!it.x) delete it.x;
+            if (!it.m) delete it.m;
+            if (!it.c) delete it.c;
+        });
+
+        stats.taken = pool.length;
+        return {
+            quiz: {
+                t: clean(opt.title) || 'Phòng ôn tập',
+                lim: Number(opt.limit) > 0 ? Number(opt.limit) : DEFAULT_LIMIT,
+                db: clean(opt.dbId),
+                dbn: clean(opt.dbName),
+                qs: pool
+            },
+            stats: stats
+        };
+    }
+
+    /** Danh sách môn có trong ngân hàng, kèm số câu dùng được. */
+    function subjectsOf(rows) {
+        var map = {};
+        (rows || []).forEach(function (q) {
+            if (!q || !clean(q.type) || clean(q.type).toLowerCase() === 'sub') return;
+            if (hasImage(q)) return;
+            var items = normalize(q);
+            if (!items.length) return;
+            var s = clean(q.subject) || '(không ghi môn)';
+            map[s] = (map[s] || 0) + items.length;
+        });
+        return Object.keys(map).sort().map(function (k) { return { name: k, count: map[k] }; });
+    }
+
+    /** So sánh câu điền khuyết: bỏ qua hoa thường, dấu cách, và 1,5 = 1.5 */
+    function sameText(a, b) {
+        var x = clean(a).toLowerCase().replace(/\s+/g, ' ');
+        var y = clean(b).toLowerCase().replace(/\s+/g, ' ');
+        if (x === y) return true;
+        var nx = Number(x.replace(',', '.')), ny = Number(y.replace(',', '.'));
+        if (!isNaN(nx) && !isNaN(ny) && x !== '' && y !== '') return Math.abs(nx - ny) < 0.01;
+        return false;
+    }
+
+    function isCorrect(item, ans) {
+        if (ans === null || ans === undefined || ans === '') return false;
+        if (item.t === 'mc') return Number(ans) === Number(item.a);
+        if (item.t === 'tf') return (ans === true || ans === 'true') === (item.a === true);
+        return sameText(ans, item.a);
+    }
+
+    /**
+     * Điểm một câu. Trả lời càng nhanh càng nhiều điểm, đúng liên tiếp có
+     * thưởng thêm — đây là chỗ tạo ra không khí đua trên bảng xếp hạng.
+     */
+    function points(correct, ms, limitSec, streak) {
+        if (!correct) return 0;
+        var lim = (Number(limitSec) || DEFAULT_LIMIT) * 1000;
+        var left = Math.max(0, 1 - (Number(ms) || 0) / lim);
+        var bonus = Math.round(SPEED_POINT * left);
+        var st = Math.min(STREAK_MAX, Math.max(0, (Number(streak) || 0) - 1) * STREAK_POINT);
+        return BASE_POINT + bonus + st;
+    }
+
+    root.LiveQuiz = {
+        DEFAULT_LIMIT: DEFAULT_LIMIT,
+        build: build,
+        subjectsOf: subjectsOf,
+        normalize: normalize,
+        isCorrect: isCorrect,
+        points: points,
+        shuffle: shuffle
+    };
 
 })(typeof window !== 'undefined' ? window : this);
 
@@ -1161,7 +1724,7 @@
         const qp = new URLSearchParams(location.search);
         if (qp.get('pin')) $('pinIn').value = qp.get('pin').replace(/\D/g, '').slice(0, 6);
 
-        function show(n) { ['s1', 's2', 's3'].forEach(id => $(id).classList.toggle('on', id === n)); }
+        function show(n) { ['s1', 's2', 's3', 's4', 's5'].forEach(id => $(id).classList.toggle('on', id === n)); }
 
         /* ---------- 1. nhập mã ---------- */
         $('pinIn').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 6); });
@@ -1294,12 +1857,14 @@
             poller = LiveNet.Poller(PIN, function (d) {
                 const players = d.players || [];
                 stage.sync(players);
+                CLASS_N = Math.max(1, players.length);
                 $('rCount').textContent = players.length + ' người';
                 if (d.title) $('rTitle').textContent = d.title;
                 if (!players.some(p => p.id === MYID)) {
                     $('waitMsg').className = ''; $('waitMsg').textContent = '⚠️ Em đã bị mời ra khỏi phòng.';
                 } else if (d.status === 'playing') {
                     $('waitMsg').className = ''; $('waitMsg').textContent = '🎬 Bài làm sắp bắt đầu!';
+                    enterQuiz();
                 }
             }, {
                 // Màn hình lớp mới là cái cả lớp nhìn, nên để nó hỏi dày.
@@ -1316,10 +1881,254 @@
 
         window.addEventListener('beforeunload', function () {
             if (poller) poller.stop();
-            if (joined && navigator.sendBeacon) {
+            // Đang làm bài mà báo rời phòng là XOÁ luôn em khỏi bảng xếp hạng —
+            // điện thoại tắt màn hình hay lỡ tay F5 cũng đủ mất trắng điểm.
+            if (joined && !playing && navigator.sendBeacon) {
                 try { navigator.sendBeacon(LiveNet.endpoint, new Blob([JSON.stringify({ action: 'liveLeave', pin: PIN, playerId: MYID })], { type: 'text/plain' })); } catch (e) { }
             }
         });
+
+        /* =====================================================================
+         *  LÀM BÀI — mỗi em tự làm theo nhịp riêng
+         *  -------------------------------------------------------------------
+         *  Toàn bộ đề nằm sẵn trong máy, chấm cũng ngay trong máy. Trong suốt
+         *  lúc làm bài trang này KHÔNG hỏi trạng thái phòng nữa, chỉ báo điểm
+         *  về theo nhịp thưa — nếu vẫn giữ vòng hỏi 4 giây như ở sảnh chờ thì
+         *  một buổi 35 em đã ngốn hết hạn mức Apps Script của cả ngày.
+         * ===================================================================== */
+
+        let QUIZ = null, QI = 0, SCORE = 0, OKN = 0, STREAK = 0;
+        let ANS = [], playing = false, reporter = null, qTimer = null, qStart = 0, playT0 = 0;
+        let CLASS_N = 1;
+
+        /** Bao lâu báo điểm một lần. Lớp càng đông càng phải giãn ra, vì chi phí
+         *  hạn mức tỉ lệ với (số em ÷ nhịp báo), không phải với payload. */
+        function reportEvery() {
+            if (!LiveNet.isGAS) return 4;
+            return Math.min(90, Math.max(25, Math.round(CLASS_N * 2.6)));
+        }
+
+        function enterQuiz() {
+            if (playing) return;
+            playing = true;
+            if (poller) poller.stop();
+            show('s4');
+            $('qText').textContent = 'Đang tải đề…';
+            $('qOpts').innerHTML = '';
+            fetchQuiz(0);
+        }
+
+        function fetchQuiz(tries) {
+            LiveNet.getQuiz(PIN).then(function (d) {
+                QUIZ = d.quiz;
+                if (!QUIZ || !QUIZ.qs || !QUIZ.qs.length) throw new Error('Bộ đề trống.');
+                prepMath(QUIZ.qs);
+                startQuiz();
+            }).catch(function (e) {
+                if (tries < 6) {
+                    $('qText').innerHTML = 'Đang tải đề… <span style="font-size:14px;opacity:.7">(thử lại lần ' + (tries + 1) + ')</span>';
+                    setTimeout(function () { fetchQuiz(tries + 1); }, 2500);
+                } else {
+                    $('qText').innerHTML = '😔 Không tải được đề.<br><span style="font-size:14px;font-weight:400">' +
+                        (e.message || '') + '</span>';
+                    $('qOpts').innerHTML = '<button class="btn" onclick="location.reload()">Thử lại</button>';
+                }
+            });
+        }
+
+        function startQuiz() {
+            QI = 0; SCORE = 0; OKN = 0; STREAK = 0; ANS = []; playT0 = Date.now();
+            $('qTot').textContent = QUIZ.qs.length;
+            reporter = LiveNet.Reporter(PIN, MYID, onRank, { every: reportEvery() });
+            renderQ();
+        }
+
+        function renderQ() {
+            if (QI >= QUIZ.qs.length) return finishQuiz();
+            const it = QUIZ.qs[QI];
+            $('qNo').textContent = QI + 1;
+            $('qScore').textContent = SCORE;
+            $('qStreak').textContent = STREAK >= 3 ? '🔥 ' + STREAK : '';
+            $('qCtx').style.display = it.c ? 'block' : 'none';
+            if (it.c) $('qCtx').innerHTML = it.c;
+            $('qText').innerHTML = it.q + (it.m ? '<br><img src="' + it.m + '" alt="">' : '');
+
+            const box = $('qOpts');
+            box.innerHTML = '';
+            if (it.t === 'mc') {
+                it.o.forEach(function (o, i) {
+                    const b = document.createElement('button');
+                    b.className = 'opt';
+                    b.innerHTML = '<span class="k">' + 'ABCDEFGH'[i] + '</span><span>' + o + '</span>';
+                    b.onclick = function () { pick(b, i); };
+                    box.appendChild(b);
+                });
+            } else if (it.t === 'tf') {
+                [['Đúng', true], ['Sai', false]].forEach(function (p) {
+                    const b = document.createElement('button');
+                    b.className = 'opt tf';
+                    b.textContent = p[0];
+                    b.onclick = function () { pick(b, p[1]); };
+                    box.appendChild(b);
+                });
+            } else {
+                const inp = document.createElement('input');
+                inp.placeholder = 'Điền câu trả lời…';
+                inp.autocomplete = 'off';
+                const b = document.createElement('button');
+                b.className = 'btn'; b.textContent = 'Trả lời →';
+                b.onclick = function () { if (inp.value.trim()) pick(b, inp.value.trim()); };
+                inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') b.onclick(); });
+                box.appendChild(inp); box.appendChild(b);
+                setTimeout(function () { inp.focus(); }, 120);
+            }
+            typeset(box); typeset($('qText'));
+
+            locked = false;
+            qStart = Date.now();
+            startTimer();
+        }
+
+        function startTimer() {
+            const bar = $('qTimer'), fill = bar.querySelector('i');
+            clearTimeout(qTimer);
+            bar.classList.remove('low');
+            fill.style.transition = 'none';
+            fill.style.transform = 'scaleX(1)';
+            if (!QUIZ.lim) { bar.style.visibility = 'hidden'; return; }   // không giới hạn giờ
+            bar.style.visibility = 'visible';
+            // ép trình duyệt vẽ lại trước khi chạy hiệu ứng, nếu không thanh đứng im
+            void fill.offsetWidth;
+            fill.style.transition = 'transform ' + QUIZ.lim + 's linear';
+            fill.style.transform = 'scaleX(0)';
+            setTimeout(function () { bar.classList.add('low'); }, Math.max(0, (QUIZ.lim - 5) * 1000));
+            qTimer = setTimeout(function () { answer(null); }, QUIZ.lim * 1000);
+        }
+
+        function pick(btn, val) {
+            if (btn.classList.contains('opt')) {
+                Array.prototype.forEach.call(btn.parentNode.children, c => c.classList && c.classList.remove('pick'));
+                btn.classList.add('pick');
+            }
+            answer(val);
+        }
+
+        let locked = false;   // chống trả lời hai lần khi bấm đúng lúc hết giờ
+        function answer(val) {
+            if (locked) return;
+            locked = true;
+            clearTimeout(qTimer);
+            $('qOpts').querySelectorAll('button,input').forEach(function (b) { b.disabled = true; });
+            const it = QUIZ.qs[QI];
+            const ms = Date.now() - qStart;
+            const ok = val !== null && LiveQuiz.isCorrect(it, val);
+            STREAK = ok ? STREAK + 1 : 0;
+            SCORE += LiveQuiz.points(ok, ms, QUIZ.lim, STREAK);
+            if (ok) OKN++;
+            ANS.push({ i: it.i, v: val, ok: ok, ms: ms });
+
+            if (navigator.vibrate) navigator.vibrate(12);
+            if (STREAK >= 3) pop('🔥 ' + STREAK + ' câu liền!');
+            else if (val === null) pop('⏰ Hết giờ');
+
+            reporter.push({ sc: SCORE, an: ANS.length, ok: OKN, ms: Date.now() - playT0 });
+            QI++;
+            setTimeout(renderQ, val === null ? 900 : 330);
+        }
+
+        function pop(txt) {
+            const e = $('qPop');
+            e.textContent = txt;
+            e.classList.remove('go'); void e.offsetWidth; e.classList.add('go');
+        }
+
+        let FINAL_MS = 0;
+        function finishQuiz() {
+            clearTimeout(qTimer);
+            // Chốt thời gian làm bài tại đây. Cùng điểm thì ai xong sớm hơn xếp
+            // trên, nên nếu để đồng hồ chạy tiếp sau khi nộp thì em nào ngồi
+            // xem lại bài lâu sẽ tự tụt hạng một cách vô lý.
+            const ms = FINAL_MS = Date.now() - playT0;
+            reporter.finish({
+                sc: SCORE, an: ANS.length, ok: OKN, ms: ms,
+                // Một KÝ TỰ cho mỗi câu, đúng thứ tự đề: 1 đúng, 0 sai, - bỏ trống.
+                // Cả lớp dùng chung một bộ đề nên không cần gửi kèm mã câu hỏi —
+                // 120 em × mã câu hỏi là đủ làm vỡ ô nhớ 100KB của cả phòng.
+                det: ANS.map(a => a.v === null ? '-' : (a.ok ? '1' : '0')).join('')
+            });
+            show('s5');
+            $('rScore').textContent = SCORE;
+            $('rRank').textContent = 'Đúng ' + OKN + '/' + QUIZ.qs.length + ' câu · đang gửi kết quả…';
+            paintReview();
+        }
+
+        function onRank(d) {
+            if (!d || !d.rank) return;
+            $('rRank').innerHTML = 'Đúng <b>' + OKN + '/' + QUIZ.qs.length + '</b> câu · Hạng <b>' + d.rank + '</b>/' + d.total +
+                (d.status === 'done' ? '<br><span style="color:#8dffc0">🏁 Thầy cô đã chốt kết quả buổi chơi.</span>' : '');
+            $('rTop').innerHTML = (d.top || []).map(function (t, i) {
+                return '<div' + (t.name === NAME ? ' class="me"' : '') + '><span>' +
+                    ['🥇', '🥈', '🥉', '4.', '5.'][i] + ' ' + esc(t.name) + '</span><b>' + t.sc + '</b></div>';
+            }).join('');
+        }
+
+        $('rAgain').onclick = function () {
+            const b = this; b.disabled = true; b.textContent = 'Đang xem…';
+            LiveNet.progress(PIN, MYID, { sc: SCORE, an: ANS.length, ok: OKN, ms: FINAL_MS, done: true })
+                .then(onRank).catch(function () { })
+                .then(function () { b.disabled = false; b.textContent = '🔄 Xem lại thứ hạng'; });
+        };
+
+        function paintReview() {
+            $('rRev').innerHTML = ANS.map(function (a, i) {
+                const it = QUIZ.qs[i];
+                let right;
+                if (it.t === 'mc') right = it.o[it.a];
+                else if (it.t === 'tf') right = it.a ? 'Đúng' : 'Sai';
+                else right = it.a;
+                let mine = a.v === null ? '(không kịp trả lời)'
+                    : it.t === 'mc' ? it.o[a.v] : it.t === 'tf' ? (a.v ? 'Đúng' : 'Sai') : a.v;
+                return '<div class="c' + (a.ok ? '' : ' bad') + '">' +
+                    '<div class="h">' + (a.ok ? '✅' : '❌') + ' Câu ' + (i + 1) + '. ' + it.q + '</div>' +
+                    (a.ok ? '' : '<div class="a">Em chọn: ' + mine + '</div>') +
+                    '<div class="a">Đáp án đúng: <b>' + right + '</b></div>' +
+                    (it.x ? '<div class="x">💡 ' + it.x + '</div>' : '') +
+                    '</div>';
+            }).join('');
+            typeset($('rRev'));
+        }
+
+        function esc(s) { return String(s).replace(/[<>&"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c])); }
+
+        /* ---------- công thức toán: chỉ nạp KaTeX khi đề thật sự có ---------- */
+        let mathOn = false;
+        function prepMath(qs) {
+            const need = qs.some(q => /[$\\]/.test(JSON.stringify(q)));
+            if (!need || mathOn) return;
+            mathOn = true;
+            const css = document.createElement('link');
+            css.rel = 'stylesheet'; css.href = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css';
+            document.head.appendChild(css);
+            const js = document.createElement('script');
+            js.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js';
+            js.onload = function () {
+                const auto = document.createElement('script');
+                auto.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js';
+                auto.onload = function () { typeset($('qText')); typeset($('qOpts')); };
+                document.head.appendChild(auto);
+            };
+            document.head.appendChild(js);
+        }
+
+        function typeset(el) {
+            if (!mathOn || !window.renderMathInElement) return;
+            try {
+                window.renderMathInElement(el, {
+                    delimiters: [{ left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false }],
+                    throwOnError: false
+                });
+            } catch (e) { }
+        }
     </script>
 </body>
 
