@@ -413,79 +413,191 @@
             transform: scale(.96)
         }
 
-        /* ===== màn làm bài ===== */
-        #s4 {
-            padding-top: max(10px, env(safe-area-inset-top))
+        /* =====================================================================
+         *  MÀN LÀM BÀI & KẾT QUẢ — mượn nguyên giao diện "kẹo ngọt" của bài
+         *  kiểm tra (public/quiz_template.html): nền pastel, thẻ trắng bo tròn,
+         *  nút dày có bóng đổ dưới đáy, chữ Nunito.
+         *
+         *  Chỉ đổi ở HAI màn này. Sảnh chờ vẫn giữ nền tím tối vì sân khấu và
+         *  nhân vật chibi được vẽ để nổi trên nền tối; bê nền sáng vào là mất
+         *  hết đèn sân khấu. Việc đổi tông giữa chừng lại thành có lợi: học
+         *  sinh cảm nhận rõ "hết giờ chơi, vào phòng thi".
+         * ===================================================================== */
+        body.quiz-mode {
+            --ink: #2b2340;
+            --ink-soft: #6b647f;
+            --paper: #ffffff;
+            --line: #ece7f7;
+            --c-start: #9BB7D4;
+            --c-mid: #C74375;
+            --c-end: #BF1932;
+            --good: #22c55e;
+            --good-d: #15803d;
+            --bad: #fb7185;
+            --bad-d: #be123c;
+            --gold: #fbbf24;
+            --gold-d: #b45309;
+            color: var(--ink);
+            background: #fdf7ff;
+            background-image:
+                radial-gradient(80% 55% at 10% -5%, var(--c-start) 0%, transparent 60%),
+                radial-gradient(70% 50% at 100% 0%, var(--c-mid) 0%, transparent 55%),
+                radial-gradient(90% 60% at 50% 110%, var(--c-end) 0%, transparent 60%),
+                linear-gradient(180deg, #fdf7ff, #eef4ff);
+            background-attachment: fixed;
+            font-family: 'Nunito', system-ui, sans-serif
         }
 
-        .qtop {
+        #s4,
+        #s5 {
+            color: var(--ink);
+            padding: max(10px, env(safe-area-inset-top)) 12px max(14px, env(safe-area-inset-bottom))
+        }
+
+        /* ---------- thanh trạng thái trên cùng ---------- */
+        .qhud {
+            background: rgba(255, 255, 255, .82);
+            backdrop-filter: blur(14px);
+            border: 2px solid var(--line);
+            border-radius: 24px;
+            padding: 10px 12px;
+            box-shadow: 0 6px 18px rgba(70, 50, 120, .10)
+        }
+
+        .qhud-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            font-size: 13.5px;
-            color: var(--dim)
+            gap: 10px
         }
 
-        .qtop b {
-            color: var(--tx);
-            font-size: 17px
+        .qava {
+            width: 40px;
+            height: 40px;
+            border-radius: 14px;
+            flex: 0 0 40px;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            color: #fff;
+            background: linear-gradient(140deg, var(--c-mid), var(--c-end));
+            box-shadow: 0 3px 0 rgba(0, 0, 0, .15)
         }
 
-        .timer {
-            height: 7px;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, .12);
+        .qname {
+            font-weight: 800;
+            font-size: 15px;
+            line-height: 1.1;
+            white-space: nowrap;
             overflow: hidden;
-            margin: 9px 0 4px
+            text-overflow: ellipsis
+        }
+
+        .qsub {
+            font-size: 11.5px;
+            color: var(--ink-soft);
+            font-weight: 700
+        }
+
+        .xp-pill {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: linear-gradient(180deg, #fde68a, var(--gold));
+            color: #7c2d12;
+            font-weight: 800;
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            box-shadow: 0 3px 0 var(--gold-d);
+            white-space: nowrap
+        }
+
+        .xp-track {
+            height: 14px;
+            background: #ece7f7;
+            border-radius: 999px;
+            margin-top: 9px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(80, 60, 130, .18)
+        }
+
+        .xp-track i {
+            display: block;
+            height: 100%;
+            width: 0;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #fbbf24, #f97316, var(--c-end));
+            transition: width .55s cubic-bezier(.34, 1.56, .64, 1)
+        }
+
+        /* đồng hồ từng câu — vẫn là thanh, nhưng tông kẹo */
+        .timer {
+            height: 10px;
+            border-radius: 999px;
+            background: #ece7f7;
+            overflow: hidden;
+            margin: 9px 0 0;
+            box-shadow: inset 0 2px 4px rgba(80, 60, 130, .18)
         }
 
         .timer i {
             display: block;
             height: 100%;
             width: 100%;
-            background: linear-gradient(90deg, #6ee7a8, #ffd76a);
+            background: linear-gradient(90deg, #34d399, #a3e635);
             transform-origin: left
         }
 
         .timer.low i {
-            background: linear-gradient(90deg, #ff8a5c, #ff5d7e)
+            background: linear-gradient(90deg, #fb923c, var(--bad))
         }
 
+        /* ---------- thân câu hỏi ---------- */
         .qbody {
             flex: 1;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            padding: 10px 2px
+            gap: 14px;
+            padding: 14px 2px 4px
+        }
+
+        .qcard {
+            background: var(--paper);
+            border: 2px solid var(--line);
+            border-radius: 24px;
+            box-shadow: 0 10px 24px rgba(70, 50, 120, .10);
+            padding: 18px 16px
         }
 
         .qctx {
-            background: rgba(255, 255, 255, .06);
-            border-left: 3px solid var(--acc);
-            border-radius: 0 12px 12px 0;
+            background: #f6f2ff;
+            border-left: 4px solid var(--c-mid);
+            border-radius: 0 14px 14px 0;
             padding: 10px 13px;
             font-size: 14px;
-            color: #d9d4ff
+            color: var(--ink-soft);
+            font-weight: 600;
+            margin-bottom: 12px
         }
 
         .qtext {
             font-size: 19px;
-            font-weight: 700;
+            font-weight: 800;
             line-height: 1.45
         }
 
         .qtext img,
         .qrev img {
             max-width: 100%;
-            border-radius: 12px
+            border-radius: 14px
         }
 
         .opts {
             display: flex;
             flex-direction: column;
-            gap: 10px
+            gap: 12px
         }
 
         .opt {
@@ -494,42 +606,143 @@
             gap: 12px;
             width: 100%;
             text-align: left;
-            background: rgba(255, 255, 255, .07);
-            border: 1px solid var(--line);
-            color: var(--tx);
-            border-radius: 16px;
-            padding: 14px;
-            font-size: 16.5px;
-            min-height: 58px;
-            cursor: pointer;
-            transition: transform .12s, background .18s
+            background: linear-gradient(180deg, #fff, #faf8ff);
+            border: 2px solid var(--line);
+            color: var(--ink);
+            border-radius: 18px;
+            padding: 14px 16px;
+            font-size: 16px;
+            font-weight: 700;
+            min-height: 60px;
+            box-shadow: 0 4px 0 #e6e0f5;
+            transition: transform .12s ease, box-shadow .12s ease, background .18s;
+            cursor: pointer
         }
 
         .opt:active {
-            transform: scale(.98)
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #e6e0f5
         }
 
         .opt.pick {
-            background: linear-gradient(135deg, var(--acc), var(--acc2));
+            background: linear-gradient(180deg, var(--c-mid), var(--c-end));
             border-color: transparent;
-            font-weight: 700
+            color: #fff;
+            box-shadow: 0 4px 0 rgba(0, 0, 0, .2)
         }
 
         .opt .k {
-            flex: 0 0 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, .35);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900
+            flex: 0 0 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: #f1ecfd;
+            color: var(--c-end);
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            font-size: 15px;
+            transition: all .18s
+        }
+
+        .opt.pick .k {
+            background: rgba(255, 255, 255, .92);
+            transform: scale(1.06)
+        }
+
+        .opt .k.ok {
+            background: #dcfce7;
+            color: var(--good-d)
+        }
+
+        .opt .k.no {
+            background: #ffe4e6;
+            color: var(--bad-d)
         }
 
         .opt.tf {
-            justify-content: center;
-            font-size: 19px;
+            font-size: 18px;
             font-weight: 800
+        }
+
+        /* Báo đúng/sai ngay sau khi em bấm.
+           CHỈ tô ô em vừa chọn, KHÔNG tô ô đúng: hai em ngồi cạnh nhau làm lệch
+           câu nhau, liếc sang thấy ô xanh là biết luôn đáp án. Muốn xem đáp án
+           đúng thì cuối bài đã có màn hình "Xem lại bài làm".
+           Đặt sau .opt.pick vì cùng độ ưu tiên — quy tắc viết sau thì thắng. */
+        .opt.right {
+            background: linear-gradient(180deg, #eafff2, #d3f9e3);
+            border-color: var(--good);
+            color: var(--good-d);
+            box-shadow: 0 4px 0 #a7ecc6
+        }
+
+        .opt.wrong {
+            background: linear-gradient(180deg, #fff1f3, #ffe0e5);
+            border-color: var(--bad);
+            color: var(--bad-d);
+            box-shadow: 0 4px 0 #f6c3cc
+        }
+
+        .opt.right .k {
+            background: #bbf7d0;
+            color: var(--good-d)
+        }
+
+        .opt.wrong .k {
+            background: #fecdd3;
+            color: var(--bad-d)
+        }
+
+        /* Câu điền khuyết không có ô để tô, nên gắn một dải báo dưới ô nhập */
+        .fibmark {
+            margin-top: 12px;
+            border-radius: 16px;
+            padding: 12px 14px;
+            font-weight: 800;
+            font-size: 16px;
+            text-align: center
+        }
+
+        .fibmark.right {
+            background: #d3f9e3;
+            color: var(--good-d)
+        }
+
+        .fibmark.wrong {
+            background: #ffe0e5;
+            color: var(--bad-d)
+        }
+
+        #s4 input,
+        #s5 input {
+            background: #fff;
+            border: 2px solid var(--line);
+            color: var(--ink);
+            border-radius: 18px;
+            font-weight: 700;
+            box-shadow: 0 4px 0 #e6e0f5
+        }
+
+        #s4 input::placeholder {
+            color: #a49dba
+        }
+
+        .btn-candy {
+            background: linear-gradient(180deg, var(--c-mid), var(--c-end));
+            border: 0;
+            color: #fff;
+            font-weight: 800;
+            border-radius: 999px;
+            min-height: 54px;
+            width: 100%;
+            font-size: 17px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 rgba(0, 0, 0, .18)
+        }
+
+        .btn-candy:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 rgba(0, 0, 0, .18)
         }
 
         .streak {
@@ -541,7 +754,8 @@
             font-weight: 900;
             opacity: 0;
             pointer-events: none;
-            text-shadow: 0 6px 22px rgba(0, 0, 0, .6)
+            color: var(--ink);
+            text-shadow: 0 6px 22px rgba(255, 255, 255, .9), 0 2px 6px rgba(120, 90, 180, .35)
         }
 
         .streak.go {
@@ -567,44 +781,57 @@
 
         /* ===== màn kết quả ===== */
         #s5 .big {
+            background: var(--paper);
+            border: 2px solid var(--line);
+            border-radius: 24px;
+            box-shadow: 0 10px 24px rgba(70, 50, 120, .10);
             text-align: center;
-            padding: 8px 0 4px
+            padding: 18px 14px 16px
+        }
+
+        #s5 .medal {
+            font-size: 46px;
+            line-height: 1
         }
 
         #s5 .big .sc {
-            font-size: 52px;
+            font-size: 46px;
             font-weight: 900;
-            line-height: 1.1;
-            background: linear-gradient(120deg, #fff, #b9a6ff, #ff9ecb);
+            line-height: 1.15;
+            background: linear-gradient(120deg, var(--c-mid), var(--c-end));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent
         }
 
         #s5 .big .rk {
-            font-size: 15px;
-            color: var(--dim)
+            font-size: 14.5px;
+            color: var(--ink-soft);
+            font-weight: 700
         }
 
         .top5 {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 6px;
             margin: 12px 0
         }
 
         .top5 div {
             display: flex;
             justify-content: space-between;
-            background: rgba(255, 255, 255, .06);
-            border-radius: 10px;
-            padding: 7px 12px;
-            font-size: 14px
+            background: rgba(255, 255, 255, .8);
+            border: 2px solid var(--line);
+            border-radius: 14px;
+            padding: 8px 13px;
+            font-size: 14px;
+            font-weight: 700
         }
 
         .top5 div.me {
-            background: linear-gradient(90deg, rgba(124, 92, 255, .5), rgba(255, 93, 158, .28));
-            font-weight: 700
+            background: linear-gradient(180deg, var(--c-mid), var(--c-end));
+            border-color: transparent;
+            color: #fff
         }
 
         .qrev {
@@ -612,40 +839,44 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             padding-bottom: 8px
         }
 
         .qrev .c {
-            background: rgba(255, 255, 255, .06);
-            border: 1px solid var(--line);
-            border-left: 4px solid #6ee7a8;
-            border-radius: 12px;
-            padding: 12px 14px;
-            font-size: 14.5px
+            background: var(--paper);
+            border: 2px solid var(--line);
+            border-left: 6px solid var(--good);
+            border-radius: 18px;
+            padding: 13px 15px;
+            font-size: 14.5px;
+            box-shadow: 0 6px 16px rgba(70, 50, 120, .08)
         }
 
         .qrev .c.bad {
-            border-left-color: #ff5d7e
+            border-left-color: var(--bad)
         }
 
         .qrev .c .h {
-            font-weight: 700;
+            font-weight: 800;
             margin-bottom: 6px
         }
 
         .qrev .c .a {
-            color: var(--dim);
+            color: var(--ink-soft);
             font-size: 13.5px;
-            margin-top: 5px
+            margin-top: 5px;
+            font-weight: 600
         }
 
         .qrev .c .x {
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px dashed var(--line);
+            margin-top: 9px;
+            padding-top: 9px;
+            border-top: 2px dashed var(--line);
             font-size: 13.5px;
-            color: #d9d4ff
+            color: #5b5470;
+            background: #fffdf5;
+            border-radius: 0 0 10px 10px
         }
 
         @keyframes d {
@@ -724,15 +955,24 @@
 
     <!-- ===== 4. LÀM BÀI ===== -->
     <div class="screen" id="s4">
-        <div class="qtop">
-            <span>Câu <b id="qNo">1</b> / <span id="qTot">10</span></span>
-            <span id="qStreak"></span>
-            <span>Điểm <b id="qScore">0</b></span>
+        <div class="qhud">
+            <div class="qhud-row">
+                <div class="qava" id="qAva">?</div>
+                <div style="min-width:0">
+                    <div class="qname" id="qName">Em</div>
+                    <div class="qsub">Câu <b id="qNo">1</b> / <span id="qTot">10</span> <span
+                            id="qStreak"></span></div>
+                </div>
+                <div class="xp-pill">⭐ <span id="qScore">0</span> XP</div>
+            </div>
+            <div class="xp-track"><i id="qProg"></i></div>
+            <div class="timer" id="qTimer"><i></i></div>
         </div>
-        <div class="timer" id="qTimer"><i></i></div>
         <div class="qbody">
-            <div class="qctx" id="qCtx" style="display:none"></div>
-            <div class="qtext" id="qText">…</div>
+            <div class="qcard">
+                <div class="qctx" id="qCtx" style="display:none"></div>
+                <div class="qtext" id="qText">…</div>
+            </div>
             <div class="opts" id="qOpts"></div>
         </div>
         <div class="streak" id="qPop"></div>
@@ -741,12 +981,13 @@
     <!-- ===== 5. KẾT QUẢ ===== -->
     <div class="screen" id="s5">
         <div class="big">
+            <div class="medal" id="rMedal">🌱</div>
             <div class="sc" id="rScore">0</div>
             <div class="rk" id="rRank">Đang gửi kết quả…</div>
         </div>
         <div class="top5" id="rTop"></div>
         <div class="qrev" id="rRev"></div>
-        <button class="btn ghost" id="rAgain">🔄 Xem lại thứ hạng</button>
+        <button class="btn-candy" id="rAgain">🔄 Xem lại thứ hạng</button>
     </div>
 
     <script>window.LIVE_ENDPOINT = "https://script.google.com/macros/s/AKfycbxn39tDwvyGq6rn4AXWv_1YicZYREIwNuaMD95dnZz3DkMlcr1t2CMnw_7Nl7HhaH0Raw/exec";</script>
@@ -1615,11 +1856,24 @@
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: body
     }).then(function (r) {
-      if (!r.ok) throw new Error('Lỗi mạng ' + r.status);
+      if (!r.ok) { const e = new Error('Lỗi mạng ' + r.status); e.network = true; throw e; }
       return r.json();
     }).then(function (d) {
-      if (d && d.error) throw new Error(d.error);
+      if (d && d.error) {
+        // Lỗi do MÁY CHỦ TRẢ LỜI, khác hẳn mất mạng. Gộp chung hai thứ này là
+        // chẩn đoán sai: phòng hết hạn mà lại hiện "Mất kết nối" thì thầy cô đi
+        // kiểm tra wifi, còn trang thì hỏi lại mãi một phòng không còn tồn tại.
+        const e = new Error(d.error);
+        e.server = true;
+        e.code = d.code || '';
+        // Hết đường cứu: có hỏi lại bao nhiêu lần nữa cũng vẫn vậy.
+        e.fatal = e.code === 'NO_ROOM' || /không tìm thấy phòng|hết hạn|đã đóng/i.test(d.error);
+        throw e;
+      }
       return d;
+    }, function (err) {
+      if (!err.network && !err.server) err.network = true;   // fetch hỏng = mất mạng thật
+      throw err;
     });
   }
 
@@ -1651,6 +1905,9 @@
         .catch(function (e) {
           fails++;
           if (opt.onError) opt.onError(e, fails);
+          // Phòng không còn thì hỏi lại vô ích, mà còn che mất lỗi thật khi
+          // thầy cô mở phòng mới. Dừng hẳn, để trang tự báo và mời tạo lại.
+          if (e && e.fatal) { stopped = true; clearTimeout(timer); return; }
           schedule(Math.min(fast * Math.pow(1.8, fails), 15000));
         });
     }
@@ -1931,10 +2188,22 @@
         stats.taken = pool.length;
         return {
             quiz: {
+                // Dấu nhận dạng của lần dựng đề này. Máy học sinh tải đề sẵn từ
+                // lúc còn ở sảnh chờ rồi giữ trong máy; nhờ `v` mà nó biết bản
+                // đang giữ có còn đúng không khi thầy cô đổi đề hoặc xáo lại.
+                v: Math.random().toString(36).slice(2, 8) + pool.length,
                 t: clean(opt.title) || 'Phòng ôn tập',
-                lim: Number(opt.limit) > 0 ? Number(opt.limit) : DEFAULT_LIMIT,
+                // 0 = KHÔNG giới hạn giờ, và đó là một lựa chọn thật sự — đừng
+                // gộp chung với "thầy cô chưa chọn gì" rồi thay bằng mặc định.
+                lim: (opt.limit === undefined || opt.limit === null || opt.limit === '')
+                    ? DEFAULT_LIMIT : Math.max(0, Number(opt.limit) || 0),
                 db: clean(opt.dbId),
                 dbn: clean(opt.dbName),
+                // Mỗi máy học sinh có tự xáo lại đề của riêng em một lần nữa hay
+                // không (xem `buildPlan` trong live_player.html). Cả lớp vẫn nhận
+                // CHUNG bộ đề này, chỉ khác thứ tự đọc — nên bật lên không tốn
+                // thêm lượt gọi nào. Tắt khi thầy cô muốn hô "cả lớp câu 5".
+                mx: opt.mix !== false,
                 qs: pool
             },
             stats: stats
@@ -1978,6 +2247,10 @@
      */
     function points(correct, ms, limitSec, streak) {
         if (!correct) return 0;
+        // Chọn "không giới hạn giờ" (limitSec = 0) thì màn hình không có đồng hồ
+        // đếm ngược, nhưng thưởng tốc độ VẪN tính theo thước 30 giây — bỏ hẳn
+        // phần thưởng này thì mọi em làm đúng như nhau đều bằng điểm nhau và
+        // bảng xếp hạng không còn phân được ai với ai.
         var lim = (Number(limitSec) || DEFAULT_LIMIT) * 1000;
         var left = Math.max(0, 1 - (Number(ms) || 0) / lim);
         var bonus = Math.round(SPEED_POINT * left);
@@ -2148,6 +2421,20 @@
                 LiveNet.emote(PIN, MYID, b.dataset.e).catch(function () { });
             });
 
+            mountPoller();
+        }
+
+        /**
+         * Nhịp hỏi ở sảnh chờ.
+         *
+         * Phòng chưa có đề thì cứ giãn tới 20 giây cho đỡ tốn hạn mức — chưa
+         * có gì để chờ cả. Nhưng khi thầy cô đã chọn xong đề thì sắp bắt đầu
+         * tới nơi, mà giãn 20 giây nghĩa là có em biết muộn tới 20 giây so với
+         * bạn ngồi cạnh. Lúc đó siết lại còn 8 giây.
+         */
+        let lobbyMax = 20000, tightened = false;
+        function mountPoller() {
+            if (poller) poller.stop();
             poller = LiveNet.Poller(PIN, function (d) {
                 const players = d.players || [];
                 stage.sync(players);
@@ -2158,20 +2445,35 @@
                     ixOn = d.fx;
                     $('ixHint').style.display = d.fx && players.length > 1 ? '' : 'none';
                 }
+                prefetchQuiz(d.quiz);
+                if (d.quiz && d.quiz.v && !tightened && d.status === 'lobby') {
+                    tightened = true; lobbyMax = 8000;
+                    setTimeout(mountPoller, 0);      // dựng lại vòng hỏi với nhịp mới
+                }
                 if (!players.some(p => p.id === MYID)) {
                     $('waitMsg').className = ''; $('waitMsg').textContent = '⚠️ Em đã bị mời ra khỏi phòng.';
                 } else if (d.status === 'playing') {
                     $('waitMsg').className = ''; $('waitMsg').textContent = '🎬 Bài làm sắp bắt đầu!';
                     enterQuiz();
+                } else if (PRE) {
+                    $('waitMsg').className = ''; $('waitMsg').textContent = '✅ Đã nhận đề, chờ thầy cô bắt đầu';
                 }
             }, {
                 // Màn hình lớp mới là cái cả lớp nhìn, nên để nó hỏi dày.
                 // Điện thoại từng em hỏi thưa hơn, và giãn tới 20s khi phòng
                 // đứng yên — đo thật cho thấy đây là chỗ ngốn quota nhiều nhất.
                 interval: LiveNet.isGAS ? 4000 : 900,
-                maxInterval: LiveNet.isGAS ? 20000 : 3000,
+                maxInterval: LiveNet.isGAS ? lobbyMax : 3000,
                 playerId: MYID,
-                onError: function (e, n) { if (n > 2) { $('waitMsg').className = ''; $('waitMsg').textContent = '📶 Mạng chập chờn, đang thử lại…'; } }
+                onError: function (e, n) {
+                    if (e && e.fatal) {          // phòng không còn -> đừng đổ cho mạng
+                        $('waitMsg').className = '';
+                        $('waitMsg').textContent = '🚪 Phòng đã đóng hoặc hết hạn. Em quét lại mã QR thầy cô đang chiếu nhé.';
+                    } else if (n > 2) {
+                        $('waitMsg').className = '';
+                        $('waitMsg').textContent = '📶 Mạng chập chờn, đang thử lại…';
+                    }
+                }
             }).start();
         }
 
@@ -2239,6 +2541,43 @@
         let ANS = [], playing = false, reporter = null, qTimer = null, qStart = 0, playT0 = 0;
         let CLASS_N = 1;
 
+        /**
+         * Đề của RIÊNG em này: cùng bộ câu với cả lớp nhưng khác thứ tự.
+         *
+         * Cả lớp nhận chung một `QUIZ.qs` (đóng gói một lần ở máy thầy cô), rồi
+         * mỗi máy tự xáo lại lấy — nên không tốn thêm lượt gọi nào, và hai em
+         * ngồi cạnh nhau cũng không bao giờ ở cùng một câu.
+         *
+         * Mỗi phần tử là BẢN SAO của câu gốc, có thêm `oi` = chỗ của nó trong
+         * `QUIZ.qs`. Cái `oi` đó là thứ giữ cho bảng phân tích của thầy cô không
+         * loạn: xem `det` trong finishQuiz.
+         */
+        let PLAN = [];
+
+        function buildPlan() {
+            const src = (QUIZ && QUIZ.qs) || [];
+            // Thầy cô tắt xáo riêng thì cả lớp làm chung một thứ tự như trước
+            const order = src.map(function (_q, i) { return i; });
+            if (QUIZ.mx !== false) LiveQuiz.shuffle(order);
+
+            PLAN = order.map(function (oi) {
+                const src1 = src[oi];
+                const it = {};
+                for (const k in src1) it[k] = src1[k];
+                it.oi = oi;
+                // Xáo A/B/C/D lần nữa cho riêng em. Bộ đề chung đã xáo sẵn một
+                // lần ở máy thầy cô, nhưng đó là xáo CHUNG — cả lớp thấy đáp án
+                // đúng ở cùng vị trí. Xáo thêm ở đây mới thật sự khác nhau.
+                if (QUIZ.mx !== false && it.t === 'mc' && Array.isArray(it.o)) {
+                    const pairs = it.o.map(function (o, i) { return { o: o, right: i === it.a }; });
+                    LiveQuiz.shuffle(pairs);
+                    it.o = pairs.map(function (p) { return p.o; });
+                    it.a = pairs.findIndex(function (p) { return p.right; });
+                }
+                return it;
+            });
+        }
+
         /** Bao lâu báo điểm một lần. Lớp càng đông càng phải giãn ra, vì chi phí
          *  hạn mức tỉ lệ với (số em ÷ nhịp báo), không phải với payload. */
         function reportEvery() {
@@ -2246,14 +2585,61 @@
             return Math.min(90, Math.max(25, Math.round(CLASS_N * 2.6)));
         }
 
+        /**
+         * Tải đề sẵn ngay khi thầy cô vừa chọn xong, lúc cả lớp còn đang chọn
+         * trang phục ở sảnh chờ.
+         *
+         * Không làm vậy thì lúc bấm bắt đầu, mỗi em phải chờ HAI lượt gọi nối
+         * đuôi nhau (biết đã bắt đầu -> rồi mới xin đề), mà 35 em cùng xin một
+         * lúc thì còn phải xếp hàng. Tải trước KHÔNG tốn thêm lượt gọi nào cả:
+         * chỉ là dời lượt xin đề lên sớm hơn, và các em xin rải rác chứ không
+         * dồn cục.
+         */
+        let PRE = null, preBusy = false;
+        function prefetchQuiz(meta) {
+            if (!meta || !meta.v || preBusy) return;
+            if (PRE && PRE.v === meta.v) return;      // bản đang giữ vẫn đúng
+            preBusy = true;
+            LiveNet.getQuiz(PIN)
+                .then(function (d) {
+                    // Thầy cô đổi đề ngay lúc đang tải thì bỏ, lượt sau lấy lại
+                    if (d && d.quiz && d.quiz.v === meta.v) PRE = d.quiz;
+                })
+                .catch(function () { })
+                .then(function () { preBusy = false; });
+        }
+
         function enterQuiz() {
             if (playing) return;
             playing = true;
             if (poller) poller.stop();
+            // Đổi sang tông "kẹo ngọt" của bài kiểm tra. Chỉ nạp phông Nunito
+            // lúc này, đừng nạp sẵn từ đầu — sảnh chờ không dùng tới mà điện
+            // thoại 4G thì phải chờ thêm một lượt tải.
+            document.body.classList.add('quiz-mode');
+            loadFont();
             show('s4');
-            $('qText').textContent = 'Đang tải đề…';
+            $('qAva').textContent = (NAME || '?').trim().charAt(0).toUpperCase();
+            $('qName').textContent = NAME || 'Em';
             $('qOpts').innerHTML = '';
+            if (PRE) {                       // đã tải sẵn từ sảnh chờ -> vào bài ngay
+                QUIZ = PRE;
+                prepMath(QUIZ.qs);
+                startQuiz();
+                return;
+            }
+            $('qText').textContent = 'Đang tải đề…';
             fetchQuiz(0);
+        }
+
+        let fontDone = false;
+        function loadFont() {
+            if (fontDone) return;
+            fontDone = true;
+            const l = document.createElement('link');
+            l.rel = 'stylesheet';
+            l.href = 'https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap';
+            document.head.appendChild(l);
         }
 
         function fetchQuiz(tries) {
@@ -2276,17 +2662,63 @@
 
         function startQuiz() {
             QI = 0; SCORE = 0; OKN = 0; STREAK = 0; ANS = []; playT0 = Date.now();
-            $('qTot').textContent = QUIZ.qs.length;
-            reporter = LiveNet.Reporter(PIN, MYID, onRank, { every: reportEvery() });
+            buildPlan();
+            $('qTot').textContent = PLAN.length;
+            reporter = DEMO
+                ? { push: function () { }, finish: function () { }, stop: function () { } }
+                : LiveNet.Reporter(PIN, MYID, onRank, { every: reportEvery() });
             renderQ();
         }
 
+        /* ---------- xem thử giao diện làm bài: live_player.html?demo=1 ----------
+           Không vào phòng, không gọi mạng, không lưu điểm — chỉ để soi giao diện
+           trên đúng cái điện thoại học sinh sẽ dùng, khỏi phải mở cả một phòng
+           chơi mỗi lần chỉnh vài dòng CSS. */
+        let DEMO = false;
+        // Phải chờ CẢ TỆP chạy xong rồi mới dựng màn xem thử: `renderQ` có đụng
+        // tới `mathOn` khai báo mãi cuối tệp, gọi thẳng ở đây là lỗi ngay.
+        // Đường bình thường không dính vì nó chỉ chạy sau khi máy chủ trả đề về.
+        if (qp.get('demo')) setTimeout(startDemo, 0);
+
+        function startDemo() {
+            DEMO = true; playing = true; NAME = 'Xem thử'; MYID = 'demo'; PIN = '000000';
+            document.body.classList.add('quiz-mode');
+            loadFont();
+            show('s4');
+            $('qAva').textContent = 'X';
+            $('qName').textContent = NAME;
+            QUIZ = {
+                t: 'Xem thử', lim: Number(qp.get('lim') || 30),
+                qs: [
+                    {
+                        i: 'd1', t: 'mc', s: 'Vật lý',
+                        q: 'Áp suất chất lỏng tác dụng lên vật nhúng trong nó theo phương nào?',
+                        o: ['Chỉ từ trên xuống', 'Theo mọi phương vuông góc với bề mặt vật',
+                            'Chỉ thẳng đứng từ dưới lên', 'Không phụ thuộc phương nào'],
+                        a: 1, x: 'Chất lỏng gây áp suất theo mọi phương lên đáy bình, thành bình và vật trong lòng nó.'
+                    },
+                    {
+                        i: 'd2', t: 'tf', s: 'Vật lý', c: 'Cho các mệnh đề về áp suất khí quyển:',
+                        q: 'Càng lên cao thì áp suất khí quyển càng giảm.', a: true,
+                        x: 'Lên cao thì cột không khí phía trên mỏng đi nên áp suất giảm.'
+                    },
+                    {
+                        i: 'd3', t: 'fib', s: 'Vật lý',
+                        q: 'Một vật có khối lượng 1,5 kg thì trọng lượng là bao nhiêu niutơn? (lấy g = 10)',
+                        a: '15'
+                    }
+                ]
+            };
+            startQuiz();
+        }
+
         function renderQ() {
-            if (QI >= QUIZ.qs.length) return finishQuiz();
-            const it = QUIZ.qs[QI];
+            if (QI >= PLAN.length) return finishQuiz();
+            const it = PLAN[QI];
             $('qNo').textContent = QI + 1;
             $('qScore').textContent = SCORE;
-            $('qStreak').textContent = STREAK >= 3 ? '🔥 ' + STREAK : '';
+            $('qStreak').textContent = STREAK >= 3 ? '· 🔥 ' + STREAK + ' câu liền' : '';
+            $('qProg').style.width = Math.round(QI / PLAN.length * 100) + '%';
             $('qCtx').style.display = it.c ? 'block' : 'none';
             if (it.c) $('qCtx').innerHTML = it.c;
             $('qText').innerHTML = it.q + (it.m ? '<br><img src="' + it.m + '" alt="">' : '');
@@ -2302,10 +2734,10 @@
                     box.appendChild(b);
                 });
             } else if (it.t === 'tf') {
-                [['Đúng', true], ['Sai', false]].forEach(function (p) {
+                [['Đúng', true, 'ok', '✓'], ['Sai', false, 'no', '✕']].forEach(function (p) {
                     const b = document.createElement('button');
                     b.className = 'opt tf';
-                    b.textContent = p[0];
+                    b.innerHTML = '<span class="k ' + p[2] + '">' + p[3] + '</span><span>' + p[0] + '</span>';
                     b.onclick = function () { pick(b, p[1]); };
                     box.appendChild(b);
                 });
@@ -2314,7 +2746,7 @@
                 inp.placeholder = 'Điền câu trả lời…';
                 inp.autocomplete = 'off';
                 const b = document.createElement('button');
-                b.className = 'btn'; b.textContent = 'Trả lời →';
+                b.className = 'btn-candy'; b.textContent = 'Trả lời →';
                 b.onclick = function () { if (inp.value.trim()) pick(b, inp.value.trim()); };
                 inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') b.onclick(); });
                 box.appendChild(inp); box.appendChild(b);
@@ -2357,21 +2789,49 @@
             locked = true;
             clearTimeout(qTimer);
             $('qOpts').querySelectorAll('button,input').forEach(function (b) { b.disabled = true; });
-            const it = QUIZ.qs[QI];
+            const it = PLAN[QI];
             const ms = Date.now() - qStart;
             const ok = val !== null && LiveQuiz.isCorrect(it, val);
             STREAK = ok ? STREAK + 1 : 0;
             SCORE += LiveQuiz.points(ok, ms, QUIZ.lim, STREAK);
             if (ok) OKN++;
-            ANS.push({ i: it.i, v: val, ok: ok, ms: ms });
+            ANS.push({ i: it.i, oi: it.oi, v: val, ok: ok, ms: ms });
 
-            if (navigator.vibrate) navigator.vibrate(12);
-            if (STREAK >= 3) pop('🔥 ' + STREAK + ' câu liền!');
-            else if (val === null) pop('⏰ Hết giờ');
+            markAnswer(ok, val);
+            // Điểm nhảy NGAY, đừng đợi renderQ của câu sau: đúng lúc em đang nhìn
+            // ô vừa xanh lên mà thấy số điểm cộng thêm thì mới thành phần thưởng.
+            $('qScore').textContent = SCORE;
+
+            if (navigator.vibrate) navigator.vibrate(ok ? 12 : [10, 55, 10]);
+            if (val === null) pop('⏰ Hết giờ');
+            else if (ok && STREAK >= 3) pop('🔥 ' + STREAK + ' câu liền!');
+            else pop(ok ? '✅ Đúng rồi!' : '❌ Chưa đúng');
 
             reporter.push({ sc: SCORE, an: ANS.length, ok: OKN, ms: Date.now() - playT0 });
             QI++;
-            setTimeout(renderQ, val === null ? 900 : 330);
+            // Chờ lâu hơn bản cũ (330ms) vì bây giờ có cái để xem: chuyển câu
+            // ngay thì màu xanh/đỏ chớp qua mất, em không kịp nhận ra mình sai.
+            setTimeout(renderQ, val === null ? 1100 : (ok ? 800 : 1000));
+        }
+
+        /**
+         * Tô ô em VỪA CHỌN xanh hoặc đỏ.
+         * Cố tình không tô ô đúng — xem ghi chú ở quy tắc `.opt.right` phía trên.
+         */
+        function markAnswer(ok, val) {
+            const box = $('qOpts');
+            const picked = box.querySelector('.opt.pick');
+            if (picked) {
+                picked.classList.remove('pick');
+                picked.classList.add(ok ? 'right' : 'wrong');
+                return;
+            }
+            if (val === null) return;         // hết giờ, không chọn gì thì không tô gì
+            // Câu điền khuyết: không có ô nào để tô, gắn một dải báo dưới ô nhập
+            const m = document.createElement('div');
+            m.className = 'fibmark ' + (ok ? 'right' : 'wrong');
+            m.textContent = ok ? '✅ Đúng rồi!' : '❌ Chưa đúng';
+            box.appendChild(m);
         }
 
         function pop(txt) {
@@ -2389,20 +2849,43 @@
             const ms = FINAL_MS = Date.now() - playT0;
             reporter.finish({
                 sc: SCORE, an: ANS.length, ok: OKN, ms: ms,
-                // Một KÝ TỰ cho mỗi câu, đúng thứ tự đề: 1 đúng, 0 sai, - bỏ trống.
-                // Cả lớp dùng chung một bộ đề nên không cần gửi kèm mã câu hỏi —
-                // 120 em × mã câu hỏi là đủ làm vỡ ô nhớ 100KB của cả phòng.
-                det: ANS.map(a => a.v === null ? '-' : (a.ok ? '1' : '0')).join('')
+                det: buildDet()
             });
             show('s5');
             $('rScore').textContent = SCORE;
-            $('rRank').textContent = 'Đúng ' + OKN + '/' + QUIZ.qs.length + ' câu · đang gửi kết quả…';
+            $('rRank').textContent = 'Đúng ' + OKN + '/' + PLAN.length + ' câu · đang gửi kết quả…';
+            // Huy chương lấy đúng mốc của bài kiểm tra, để hai bên nói cùng ngôn ngữ
+            const pct = Math.round(OKN / PLAN.length * 100);
+            $('rMedal').textContent = pct === 100 ? '👑' : pct >= 80 ? '🏆' : pct >= 65 ? '🥈' : pct >= 50 ? '🥉' : '🌱';
+            $('rMedal').title = pct === 100 ? 'Tuyệt đối' : pct >= 80 ? 'Cao thủ' : pct >= 65 ? 'Khá cứng' : pct >= 50 ? 'Đang lên' : 'Cần luyện thêm';
+            if (DEMO) {
+                $('rRank').innerHTML = 'Đúng <b>' + OKN + '/' + PLAN.length + '</b> câu · bản xem thử, không lưu điểm';
+                $('rAgain').style.display = 'none';
+            }
             paintReview();
+        }
+
+        /**
+         * Một KÝ TỰ cho mỗi câu: 1 đúng, 0 sai, - bỏ trống. Không gửi kèm mã câu
+         * hỏi vì 120 em × mã câu hỏi là đủ làm vỡ ô nhớ 100KB của cả phòng.
+         *
+         * Xếp theo THỨ TỰ ĐỀ GỐC (`QUIZ.qs`) chứ KHÔNG theo thứ tự em vừa làm.
+         * Mỗi em một thứ tự riêng, mà bảng kết quả của thầy cô lại đọc chuỗi này
+         * theo vị trí ("Cau 1", "Cau 2"… trong file CSV) — gửi theo thứ tự riêng
+         * thì mỗi em một nghĩa, cả bảng thành vô nghĩa.
+         */
+        function buildDet() {
+            const out = new Array((QUIZ.qs || []).length).fill('-');
+            ANS.forEach(function (a) {
+                if (a.oi === undefined || a.oi < 0 || a.oi >= out.length) return;
+                out[a.oi] = a.v === null ? '-' : (a.ok ? '1' : '0');
+            });
+            return out.join('');
         }
 
         function onRank(d) {
             if (!d || !d.rank) return;
-            $('rRank').innerHTML = 'Đúng <b>' + OKN + '/' + QUIZ.qs.length + '</b> câu · Hạng <b>' + d.rank + '</b>/' + d.total +
+            $('rRank').innerHTML = 'Đúng <b>' + OKN + '/' + PLAN.length + '</b> câu · Hạng <b>' + d.rank + '</b>/' + d.total +
                 (d.status === 'done' ? '<br><span style="color:#8dffc0">🏁 Thầy cô đã chốt kết quả buổi chơi.</span>' : '');
             $('rTop').innerHTML = (d.top || []).map(function (t, i) {
                 return '<div' + (t.name === NAME ? ' class="me"' : '') + '><span>' +
@@ -2419,7 +2902,9 @@
 
         function paintReview() {
             $('rRev').innerHTML = ANS.map(function (a, i) {
-                const it = QUIZ.qs[i];
+                // Đọc theo PLAN, không phải QUIZ.qs: em này làm theo thứ tự riêng,
+                // và với câu trắc nghiệm thì A/B/C/D cũng đã xáo lại theo máy em.
+                const it = PLAN[i];
                 let right;
                 if (it.t === 'mc') right = it.o[it.a];
                 else if (it.t === 'tf') right = it.a ? 'Đúng' : 'Sai';
